@@ -22,6 +22,7 @@ rrvar.pv <- function(df.rr, svy, pv = F, ...) {
   # f : (number) variance factor (depends on replication method: BRR, jackknife-1, jk-2,…) (Fay = 1.5)
   if (svy %in% c("TALISTCH","TALISSCH","PISA","PISA2015","PBTS")) f = 1/(0.5^2)
   else if (svy == "SSES") f = 76/2
+  else if (svy == "SSES2023") f = 1/(0.5^2) #Changed from Jk1 method to BBR method 
   else if (svy %in% c("ALL","IALS")) f = 30
   else if (svy == "IELS") f = 92/23
   else if (svy == "PIAAC") f = 80*(79/80)
@@ -78,7 +79,7 @@ n.obs.x <- function(df, by.var, x, svy) {
       else if (svy == "PISA") {mutate(.,school.n = ifelse(is.na(get(x)) == T, NA, schoolid)) %>% 
           summarise(., n.obs = sum(!is.na(get(x))),
                     n.sch = n_distinct(school.n, na.rm = T))}
-      else if (svy == "SSES") {mutate(.,school.n = ifelse(is.na(get(x)) == T, NA, schid)) %>% 
+      else if (svy %in% c("SSES","SSES2023")) {mutate(.,school.n = ifelse(is.na(get(x)) == T, NA, schid)) %>% 
           summarise(., n.obs = sum(!is.na(get(x))),
                     n.sch = n_distinct(school.n, na.rm = T))}
       else summarise(., n.obs = sum(!is.na(get(x))))
@@ -120,6 +121,7 @@ format.data.repest <- function(df, svy, x, by.over, user_na = F, ...) {
   else if (svy == "TALISSCH") weight.variables <- c("schwgt",paste0("srwgt",1:100))
   else if (svy %in% c("PISA","PISA2015")) weight.variables <- c("w_fstuwt",paste0("w_fsturwt",1:80))
   else if (svy == "SSES") weight.variables <- c("wt2019",paste0("rwgt",1:76))
+  else if (svy == "SSES2023") weight.variables <- c("wt2023",paste0("rwgt",1:80))
   else if (svy == "PISAOOS") weight.variables <- c("spfwt0",paste0("spfwt",1:30))
   else if (svy == "TALISEC_STAFF") weight.variables <- c("staffwgt",paste0("srwgt",1:92))
   else if (svy == "TALISEC_LEADER") weight.variables <- c("cntrwgt",paste0("crwgt",1:92))
@@ -157,6 +159,13 @@ format.data.repest <- function(df, svy, x, by.over, user_na = F, ...) {
   }else{
     df.res <- df.res %>% 
       mutate_at(by.over,to_character)
+  }
+  
+  #Show variables that create over categories in column names of results
+  if (!is.null(arguments$show_over_vars)) {
+    for (i in tolower(arguments$show_over_vars)) {
+      df.res[[i]] <- paste(i, df.res[[i]], sep = "..")
+    }
   }
   
   
@@ -235,6 +244,7 @@ replicated_w_names <- function(svy, ...) {
   else if (svy %in% c("PISA","PISA2015")) weight.variables <- c("w_fstuwt",paste0("w_fsturwt",1:80))
   else if (svy == "PISAOOS") weight.variables <- c("spfwt0",paste0("spfwt",1:30))
   else if (svy == "SSES") weight.variables <- c("wt2019",paste0("rwgt",1:76))
+  else if (svy == "SSES2023") weight.variables <- c("wt2023",paste0("rwgt",1:80))
   else if (svy == "TALISEC_STAFF") weight.variables <- c("staffwgt",paste0("srwgt",1:92))
   else if (svy == "TALISEC_LEADER") weight.variables <- c("cntrwgt",paste0("crwgt",1:92))
   else if (svy == "PIAAC") weight.variables <- c("spfwt0",paste0("spfwt",1:80))

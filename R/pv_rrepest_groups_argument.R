@@ -6,7 +6,7 @@
 #' @param column (string) Column where the data is located
 #' @param cases  (string vector) List of values to be put into the group
 #' @export
-#' @return list of groups to redifine {group_name = {column, values_in_group},...}
+#' @return list of groups to redefine group_name = column, values_in_group
 #'
 #' @examples
 #' append(grp("OECD Average","CNTRY",c("HUN","MEX")), grp("Europe","CNTRY",c("ITA","FRA")))

@@ -2,15 +2,23 @@
 #grp("ARE-AUS","CNTRY",c("ARE","AUS"))
 #grp("OECD Average","CNTRY",c("HUN","MEX"))
 
-average_groups <- function(res, group, by) {
+average_groups <- function(res, group, by, ...) {
   # Goal: Average across sub samples of results assuming same size
   # ------ INPUTS ------.
   # res : (dataframe) df of results with b. and se. to average
   # group: (grp function) that takes arguments group.name, column, cases to create averages at the end of dataframe
   # by: (string vector) column in which we'll break down results
+  # ...
+  # na_to_zero : (Bool) TRUE → will take NA as zero for the simple average calculation
+  
+  #Get na_to_zero from ...
+  arguments <- list(...)
   
   #Iterate over the names of of each group
   res.avgs <- lapply(names(group), function(g_i){
+    # Replacing all NAs with zeros to consider for simple average
+    if (!is.null(is.there(arguments$na_to_zero))) if(arguments$na_to_zero) res <- res %>% replace(is.na(.),0)
+    
     res.df <- res %>% 
       mutate(!!group[[g_i]][["column"]] := 
                ifelse(get(group[[g_i]][["column"]]) %in%

@@ -1,8 +1,6 @@
 #' PISA 2018 Student questionnaire Database
 #'
 #' This dataset is a subset of the PISA 2018 database produced by the OECD for the countries of France, Italy, and Mexico.
-#' The full data along with the codebook is available from \url{https://www.oecd.org/pisa/data/2018database/}.
-#'
 #'
 #' @docType data
 #' @keywords datasets
@@ -14,8 +12,6 @@ NULL
 #' TALIS 2018 Teachers Database
 #'
 #' This dataset is a subset of the TALIS 2018 database produced by the OECD for the countries of France, Italy, and Mexico.
-#' The full data along with the codebook is available from \url{https://www.oecd.org/education/talis/talis-2018-data.htm}.
-#'
 #'
 #' @docType data
 #' @keywords datasets

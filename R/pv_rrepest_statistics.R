@@ -27,7 +27,8 @@ pv.brr.stat.by <- function(df, statistic = "mean",x, w, by.var, over, test, n.df
   # STATISTICS --------------------------------------------------------------.
   if(statistic == "quant") {res.col <- summarise(res.col, w.quant = weighted.quant(get(x),get(w),arg$q.iqr))}
   else if(statistic == "iqr") {res.col <- summarise(res.col, w.iqr = weighted.iqr(get(x),get(w),arg$q.iqr))}
-  else if(statistic == "mean") {res.col <- summarise(res.col, w.mean = weighted.mean(get(x),get(w),na.rm = T))}
+  else if(statistic %in% c("mean","means")) {res.col <- summarise(res.col, w.mean = weighted.mean(get(x),get(w),na.rm = T))}
+  else if(statistic %in% c("meanpct","meanspct")) {res.col <- summarise(res.col, w.mean = weighted.mean(get(x),get(w),na.rm = T)*100)}
   else if(statistic == "var") {res.col <- summarise(res.col, w.var = weighted.var(get(x),get(w),na.rm = T))}
   else if(statistic %in% c("std","sd")) {res.col <- summarise(res.col, w.std = weighted.std(get(x),get(w),na.rm = T))}
 

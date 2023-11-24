@@ -157,7 +157,7 @@ rrepest_base <- function(data, svy, est, by = NULL, over = NULL,
       res.tgt.i <- list()
       #-------------- STATISTICS --------------.
       # If there is something else than freq
-      if(any(c("mean","var","std", "sd", "quant", "iqr") %in% what )){
+      if(any(c("mean","means","meanpct","meanspct","var","std", "sd", "quant", "iqr") %in% what )){
         # remove "lm" and "freq"
         what.statistic <- what[! what %in% c("lm","freq","corr","cov")]
         

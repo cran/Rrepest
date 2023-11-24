@@ -12,6 +12,5 @@ data(df_pisa18)
 }
 \description{
 This dataset is a subset of the PISA 2018 database produced by the OECD for the countries of France, Italy, and Mexico.
-The full data along with the codebook is available from \url{https://www.oecd.org/pisa/data/2018database/}.
 }
 \keyword{datasets}

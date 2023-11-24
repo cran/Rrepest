@@ -43,11 +43,12 @@
 #' @import flextable
 #' @import stringr
 #' @import officer
-#' @importFrom stats as.formula coefficients lm.wfit na.omit qnorm resid weighted.mean
+#' @importFrom stats as.formula coefficients lm.wfit na.omit qnorm resid weighted.mean setNames
 #' @importFrom utils combn head
 #' @rawNamespace import(data.table, except = c(first,last,between,transpose))
 #' @rawNamespace import(purrr, except = c(when,compose,accumulate))
 #' @rawNamespace import(magrittr, except = c(set_names,extract))
+#' 
 #'
 #' @return Dataframe containing estimation "b." and standard error "se." of desired processes
 #' @export
@@ -72,7 +73,7 @@ Rrepest <- function(data, svy, est, by = NULL, over = NULL,
   # svy : List of possible projects to analyse TALISSCH and TALISTCH
   ######### WHAT ######### 
   # est : (est function) that takes arguments what = estimate, tgt = target, rgr = regressor
-      # what : (string vector) accepts "mean","var","std", "quant", "iqr", "freq", "lm", "corr", "cov", "gen"
+      # what : (string vector) accepts "mean", "mean pct","var","std", "quant", "iqr", "freq", "lm", "corr", "cov", "gen"
       # tgt : (string vector) variable from where to get frequencies or R script if selected "gen"
       # rgr : (string vector) independant variable for regression (1+)
   ######### WHERE ######### 
@@ -88,6 +89,7 @@ Rrepest <- function(data, svy, est, by = NULL, over = NULL,
   # table : (Bool) TRUE → Creates a flextable with all examples
   # ...
   # isced : (number) isced level to analyze
+  # na_to_zero : (Bool) TRUE → will take NA as zero for the simple average calculation
   
   # Create a list of dfs for ewach conserning group
   if (!is.null(group)) {
@@ -133,7 +135,7 @@ Rrepest <- function(data, svy, est, by = NULL, over = NULL,
   
   # AVERAGES of results -----------------------------------------------------
   if (!is.null(average)) {
-    res.l <- average_groups(res = res.l, group = average, by = by)
+    res.l <- average_groups(res = res.l, group = average, by = by, ...)
   }
   
   #-------------- PRETTY TABLES --------------.

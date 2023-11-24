@@ -23,7 +23,7 @@ ft_significance <- function(ft_i, z = qnorm(1 - .05/2), statistic){
                  j = n_i-1)
       }
     } else { #If no "lm" only tests get sig. diff.
-      # If have structure _(_-_)_ and start with se
+      # If have structure _(_-_)_ and start with se (NOTE: the middle hyphen common hyphen)
       if (grepl(".*\\(.*\\-.*\\).*", col_n[n_i]) &
           grepl(".*SE$", col_n[n_i])) {
         # Evaluate Statistically Significant rows

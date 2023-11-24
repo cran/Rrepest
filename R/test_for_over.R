@@ -100,7 +100,7 @@ over.test <- function(data, over) {
     c.names.b <- colnames(res.d)[(length(res.d)-n.diff):length(res.d)]
     
     #Create names for difference columns on the format:
-    #(1st - last)|rest
+    #(1st - last)|rest (NOTE: the middle hyphen is normal hyphen)
     c.names.diffs <- c()
     for (i in seq_along(c.names.a)) {
       if(n.diff > 0) {

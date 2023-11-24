@@ -14,7 +14,7 @@ grp(group.name, column, cases)
 \item{cases}{(string vector) List of values to be put into the group}
 }
 \value{
-list of groups to redifine {group_name = {column, values_in_group},...}
+list of groups to redefine group_name = column, values_in_group
 }
 \description{
 Obtain a list as argument for groups to be evaluated in data

@@ -40,7 +40,7 @@ n_obs_x <- function(df, by, x, svy = NULL) {
       else if (svy == "PISA") {mutate(.,school.n = ifelse(is.na(get(x)) == T, NA, schoolid)) %>% 
           summarise(., n.obs = sum(!is.na(get(x))),
                     n.sch = n_distinct(school.n, na.rm = T))}
-      else if (svy == "SSES") {mutate(.,school.n = ifelse(is.na(get(x)) == T, NA, schid)) %>% 
+      else if (svy %in% c("SSES","SSES2023")) {mutate(.,school.n = ifelse(is.na(get(x)) == T, NA, schid)) %>% 
           summarise(., n.obs = sum(!is.na(get(x))),
                     n.sch = n_distinct(school.n, na.rm = T))}
       else summarise(., n.obs = sum(!is.na(get(x))))

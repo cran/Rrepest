@@ -11,12 +11,19 @@ A "cheat sheet" including an overview of the syntax and uses of `Rrepest` is ava
 
 ## Installation
 
+### Using CRAN
+
+Run the following code:
+``` r
+install.packages("Rrepest")
+```
+
 ### Using tar.gz file
 
 [Download Rrepest](https://gitlab.algobank.oecd.org/edu_data/rrepest/-/blob/main/Development/Rrepest.tar.gz),
 then run
 
-Run the following code replacing "You_R_Name" with your username.
+Run the following code replacing "You_R_Name" with your username:
 ``` r
 install.packages("C:/Users/You_R_Name/Downloads/Rrepest.tar.gz",
 repos = NULL,
@@ -30,7 +37,7 @@ library(Rrepest)
 
 ### Using a GitLab token
 
-Run the following code replacing "MY_TOKEN" with your gitlab token.
+Run the following code replacing "MY_TOKEN" with your gitlab token:
 ``` r
 remotes::install_gitlab("edu_data/rrepest", host = "https://algobank.oecd.org:4430", upgrade = "never", auth_token = "MY_TOKEN")
 ```
