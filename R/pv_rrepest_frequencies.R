@@ -61,11 +61,22 @@ pv.get.se.reorder <- function(brr.res, svy, pv = F, ...) {
   return(res)
 }
 
+#' Within group frequencies of categories in a column.
+#'
+#' @param data (data frame) Data to analyze.
+#' @param small.level (string vector) all variables to get grouped sum.
+#' @param big.level (string vector) Must be fully contained in variables from small.level
+#' @param w (string) Numeric variable from which to get weights (if NULL then 1).
+#'
+#' @return Data frame with frequencies from the grouped sum of small.level and big.level used for getting percentages.
+#' @export
+#'
+#' @examples grouped_sum_freqs(data = mtcars,small.level = c("cyl","gear"),big.level = c("cyl"))
 grouped_sum_freqs <- function(data, small.level, big.level, w = NULL) {
   # Goal: Get a dataframe with frequencies from the grouped sum of small.level and big.level used for getting percentages
   # Example: cnt gender wealth 
   # ------ INPUTS ------.
-  # data : (dataframe) df to analize
+  # data : (dataframe) df to analyze
   # w : (string) numeric variable from which to get weights (if NULL then 1)
   # small.level : (string vector) all variables to get grouped sum
   # big.level : (string vector) Must be fully contained in variables from small.level 
@@ -93,28 +104,8 @@ grouped_sum_freqs <- function(data, small.level, big.level, w = NULL) {
   
   return(res)
 }
-# Ex.
-#grouped_sum_freqs(data = df.t,small.level = c("CNTRY","TT3G06A1"),big.level = c("CNTRY"),w = "TCHWGT")
 
 
-
-format.data.categ.vars <- function(df, categ.vars, show_na = F) {
-  # Goal: Converts to numeric all variables for a continuous analysis (means, regression, etc.)
-  # ------ INPUTS ------.
-  # data : (dataframe) df to analyze
-  # cont.vars : (string vector) continuous variables for analysis
-  
-  if (show_na) {
-    df.res <- df %>% 
-      mutate_at(categ.vars,to_factor,drop_unused_labels = TRUE ,user_na_to_na = TRUE) 
-  }else{
-    df.res <- df %>% 
-      mutate_at(categ.vars,to_factor,drop_unused_labels = TRUE ,user_na_to_na = TRUE) %>% 
-      drop_na(all_of(categ.vars))
-  }
-  
-  return(df.res)
-}
 row.pct.byvar.x <- function(data, x, by.var, over, test = F, flag = F, w, ...) {
   # Goal: Dataframe with coefficients and standard error of statistics from model
   # ------ INPUTS ------.
@@ -172,7 +163,7 @@ row.pct.byvar.x.PAR <- function(data, x, by.var, over, test = F, flag = F, w, ..
   return(res.df)
 }
 
-pv.loop.freq.on.weights <- function(data, x, by.var, over, test = F, flag = F, svy, rep_weights, pv = F) {
+pv.loop.freq.on.weights <- function(data, x, by.var, over, test = F, flag = F, svy, rep_weights, pv = F, ...) {
   # Goal: List with all weighted frequencies of x by by.var
   # ------ INPUTS ------.
   # data : (dataframe) df to analize
@@ -307,7 +298,7 @@ pv.rrepest.frequencies <- function(data, svy, x, by.var = NULL, over = NULL, tes
   }
   
   # X is categorical in a frequency, must be formatted accordingly
-  data <- format.data.categ.vars(data,
+  data <- format_data_categ_vars(data,
                                get.pv.arguments(extra.args$pvdigits, x),
                                show_na)
   
@@ -333,7 +324,8 @@ pv.rrepest.frequencies <- function(data, svy, x, by.var = NULL, over = NULL, tes
                                   test = test,
                                   flag = flag,
                                   rep_weights = weight.names,
-                                  pv = pv)
+                                  pv = pv,
+                                  ... = ...)
   
   
   

@@ -25,13 +25,16 @@ rrvar.pv <- function(df.rr, svy, pv = F, ...) {
   else if (svy == "SSES2023") f = 1/(0.5^2) #Changed from Jk1 method to BBR method 
   else if (svy %in% c("ALL","IALS")) f = 30
   else if (svy == "IELS") f = 92/23
-  else if (svy == "PIAAC") f = 80*(79/80)
+  ### for the case of PIAAC, f depends on countries. The correct variance factor will be applied in rrepest_base
+  ### before b.se.pv is called.
+  else if (svy == "PIAAC") f = 80
   else if (svy == "PISAOOS") f = 29
   else if (svy %in% c("TIMSS","PIRLS")) f = 1/2*150
   else if (svy %in% c("ICCS","ICILS")) f = 1*75
   else if (svy %in% c("ICCS_T","ICILS_T")) f = 1*75
   else if (svy %in% c("ICCS_C","ICILS_C")) f = 1*75
   else if (svy %in% c("LEADER_TALISEC","STAFF_TALISEC","TALISEC_LEADER","TALISEC_STAFF")) f = 92/23
+
   
   #if there is custom variance factor grab it from the arguments
   if (!is.null(arguments$var.factor)) {
@@ -70,16 +73,19 @@ n.obs.x <- function(df, by.var, x, svy) {
   tot.n <- df %>%
     group_by(across(all_of(by.var))) %>%
     {if (svy == "TALISSCH") summarise(., n.obs = sum(!is.na(get(x)))) 
-      else if (svy == "TALISTCH") {mutate(.,school.n = ifelse(is.na(get(x)) == T, NA, idschool)) %>% 
+      else if (svy == "TALISTCH") {mutate(.,school.n = ifelse(is.na(get(x)) == T, NA, .data$idschool)) %>% 
           summarise(., n.obs = sum(!is.na(get(x))),
                     n.sch = n_distinct(school.n, na.rm = T))}
-      else if (svy == "PISA2015") {mutate(.,school.n = ifelse(is.na(get(x)) == T, NA, cntschid)) %>% 
+      else if (svy == "TALISEC_STAFF") {mutate(.,school.n = ifelse(is.na(get(x)) == T, NA, .data$idcentre)) %>% 
           summarise(., n.obs = sum(!is.na(get(x))),
                     n.sch = n_distinct(school.n, na.rm = T))}
-      else if (svy == "PISA") {mutate(.,school.n = ifelse(is.na(get(x)) == T, NA, schoolid)) %>% 
+      else if (svy == "PISA2015") {mutate(.,school.n = ifelse(is.na(get(x)) == T, NA, .data$cntschid)) %>% 
           summarise(., n.obs = sum(!is.na(get(x))),
                     n.sch = n_distinct(school.n, na.rm = T))}
-      else if (svy %in% c("SSES","SSES2023")) {mutate(.,school.n = ifelse(is.na(get(x)) == T, NA, schid)) %>% 
+      else if (svy == "PISA") {mutate(.,school.n = ifelse(is.na(get(x)) == T, NA, .data$schoolid)) %>% 
+          summarise(., n.obs = sum(!is.na(get(x))),
+                    n.sch = n_distinct(school.n, na.rm = T))}
+      else if (svy %in% c("SSES","SSES2023")) {mutate(.,school.n = ifelse(is.na(get(x)) == T, NA, .data$schid)) %>% 
           summarise(., n.obs = sum(!is.na(get(x))),
                     n.sch = n_distinct(school.n, na.rm = T))}
       else summarise(., n.obs = sum(!is.na(get(x))))
@@ -95,8 +101,25 @@ n.obs.x <- function(df, by.var, x, svy) {
 # n.obs.x(df = df.p,by.var = "cntry",x = "tc3g06b",svy = "TALISSCH")
 # n.obs.x(df = df.t,by.var = "cntry",x = "tt3g01",svy = "TALISTCH")
 
-#Formatting
-format.data.repest <- function(df, svy, x, by.over, user_na = F, ...) {
+
+#' Formatting target, by, and over variables for Rrepest.
+#'
+#' @param df (data frame) Data to analyze.
+#' @param svy (string) Possible projects to analyse: PIAAC, PISA, TALISSCH, TALISTCH, etc.
+#' @param x (string vector) Target variables.
+#' @param by.over (string vector) Variables to break analysis by.
+#' @param user_na (bool) TRUE → show nature of user defined missing values
+#' @param ... Optional arguments such as custom weights (cm.weights) 
+#'
+#' @return Data frame with variables in numeric format for analysis.
+#' @export
+#'
+#' @examples
+#' df1 <- format_data_repest(df_pisa18, "PISA", "pv1math", "cnt")
+#' df2 <- format_data_repest(df_pisa18, "PISA", "pv1math", c("cnt","st004d01t"))
+#' df3 <- format_data_repest(df_pisa18, "PISA", "pv1math", c("cnt","st004d01t","iscedl"))
+#' df4 <- format_data_repest(df_talis18, "TALISTCH", "tt3g02", "cntry", isced = 2)
+format_data_repest <- function(df, svy, x, by.over, user_na = F, ...) {
   # Goal: Get database into appropriate format
   # ------ INPUTS ------.
   # df : (dataframe) df to analyze
@@ -140,6 +163,17 @@ format.data.repest <- function(df, svy, x, by.over, user_na = F, ...) {
     weight.variables <- arguments$cm.weights #custom optional weights
   }
   
+  #if PIAAC, compute variance factor at the respondent level
+  if (svy=="PIAAC") {
+    df <- df %>% mutate(var_fac=
+                          case_when(vemethodn==1 ~ (venreps-1)/venreps,
+                                    vemethodn==2 ~ 1,
+                                    vemethodn==3 ~ 1/venreps,
+                                    vemethodn==4 ~ 1/(venreps*(1-vefayfac)^2)
+                          ))
+  }
+  
+  
   #If x has an @ for PVs
   if (grep("@", x) %>% length() != 0) {
     x <- get.pv.names(df, x)
@@ -171,11 +205,6 @@ format.data.repest <- function(df, svy, x, by.over, user_na = F, ...) {
   
   return(df.res)
 }
-#EX. df <- format.data.repest(df.qqq, "PISA", "pv1math", "cnt")
-#EX. df <- format.data.repest(df.qqq, "PISA", "pv@math", "cnt")
-#EX. df <- format.data.repest(df.qqq, "PISA", "pv1math", c("cnt","st004d01t"))
-#EX. df <- format.data.repest(df.qqq, "PISA", "pv1math", c("cnt","st004d01t","iscedl"))
-#EX. df <- format.data.repest(df.t, "TALISTCH", "tt3g02", "cntry", isced = 2)
 
 do_group <- function(data, grp.l, user_na = F, ...){
   # Goal: Create dataframe with the groups on the variables and values defined
@@ -266,6 +295,56 @@ replicated_w_names <- function(svy, ...) {
 }
 #EX. wts <- replicated_w_names("PISA")
 #EX. wts <- replicated_w_names("TALISTCH")
+
+add_PIAAC_variance_factors <- function(pv.l, pv, df,by.var){
+  # GOAL: multiply each se in pv.l by the variance factor specific to the by.var
+  # ------ INPUTS ------
+  # pv.l (list of df) for each pv, a df with bs and ses
+  # pv (boolean) is there any pv
+  # df (df) respondent level data
+  # by.var (string) value of the by.var
+  
+  
+  #in case the value of the variance factor is not constant within the estimation sample:
+  # take the average, and then print a message
+  # can happens when the sample contains several countries 
+  var_facs <- df %>%  group_by(all_of(across(by.var))) %>%  
+    distinct(across("var_fac")) %>% 
+    rename(`by.var`=by.var)
+  
+  check <- var_facs %>%  count %>% 
+    ungroup %>% summarize(max(n)) %>%  pull
+  
+  if (check>1) {
+    var_facs <- var_facs %>%  group_by(all_of(across(by.var))) %>% 
+      summarise(var_fac=mean(.data$var_fac, na.rm=TRUE))
+    message("Variance factors are not constant within by.var")
+  } 
+  
+  # if there is no pv the 'ses' in pv.l are multiplied by the sqrt of the variance factor
+  if (!pv) {
+    pv.l[[1]] <-  pv.l[[1]] %>% full_join(var_facs, by= "by.var") %>% 
+      mutate(across(starts_with("se"),
+                    ~ .x *sqrt(.data$var_fac))) %>% 
+      select(-"var_fac")
+  } else {
+    # if there is a pv the 'ses' in pv.l are multiplied by the variance factor 
+    # (in such a case, the 'ses' are actually the square of the true ses)!!!
+    pv.l <- lapply(pv.l, FUN = function(pv.i) {
+      pv.i %>% full_join(var_facs, by= "by.var") %>% 
+        mutate(across(starts_with("se"),
+                      ~ .x *.data$var_fac)) %>% 
+        select(-"var_fac")
+    })
+    
+  }
+  
+  
+  return(pv.l)
+}
+
+
+
 
 
 get.pv.arguments <- function(digit.pvs, argument) {
@@ -478,7 +557,7 @@ rrepest.stats <- function(df, svy, statistic = "mean", x, by.var, over, test, sh
   # Get weight names
   wts <- replicated_w_names(svy)
   # Format data according to survey
-  df <- format.data.repest(df, svy, x, c(by.var,over), user_na, isced = is.there(extra$isced))
+  df <- format_data_repest(df, svy, x, c(by.var,over), user_na, isced = is.there(extra$isced))
   
   # Loop over weights
   res.list <- vectorize.stat.on.weights(df = df,
@@ -495,5 +574,34 @@ rrepest.stats <- function(df, svy, statistic = "mean", x, by.var, over, test, sh
 
 
 
+separate_test_name <- function(test_name){
+  # GOAL: Create two strings from the test column name for coverage
+  # ------ INPUTS ------.
+  # test_name : (string) string containing column name from test with structure nn.(x-y) 
+  name_parts <- strsplit(test_name,"..",fixed = TRUE)[[1]]
+  test_parts <- strsplit(name_parts[length(name_parts)],"-")[[1]]
+  
+  string_1 <- paste(c(name_parts[1:(length(name_parts)-1)],substr(test_parts[1],2,nchar(test_parts[1]))),collapse = "..")
+  string_2 <- paste(c(name_parts[1:(length(name_parts)-1)],substr(test_parts[2],1,nchar(test_parts[2])-1)),collapse = "..")
+  return(c(string_1,string_2))
+}
 
+nans_from_se2b <- function(df){
+  # GOAL: Force NaNs that appear in se. columns to b. columns from coverage and flags
+  # ------ INPUTS ------.
+  # df : (dataframe) Resulting df from analysis with se. and b. columns
+  for (col_i in names(df)){
+    # Get se. columns
+    if(startsWith(col_i,"se")){
+      # Find the NaN in the column
+      nan_s <- which(is.nan(df[col_i][[1]]))
+      # If there are, replace the same values with NaN in b.
+      if (length(nan_s)>0){
+        common_name <- substr(col_i,4,nchar(col_i))
+        df[paste0("b.",common_name)][[1]][nan_s] <- NaN
+      }
+    }
+  }
+  return(df)
+}
 

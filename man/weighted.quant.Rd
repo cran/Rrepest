@@ -2,22 +2,22 @@
 % Please edit documentation in R/weighted_quantile.R
 \name{weighted.quant}
 \alias{weighted.quant}
-\title{Weighted Quantile}
+\title{Weighted quantile}
 \usage{
 weighted.quant(x, w = rep(1, length(x)), q = 0.5)
 }
 \arguments{
-\item{x}{(numeric vector) variable from where to get quantiles}
+\item{x}{(numeric vector) Variable of interest for which to compute the quantile}
 
-\item{w}{(numeric vector) vector of weights}
+\item{w}{(numeric vector) Vector with the weights}
 
-\item{q}{(numeric vector) From 0 to 1 (exclusive) for the quantile desired}
+\item{q}{(numeric vector) A number between 0 and less than 1 indicating the desired quantile}
 }
 \value{
-Weighted quantile of a numeric vector
+Scalar containing the quantile
 }
 \description{
-Computation of weighted quantiles
+Computes weighted quantiles of a numeric vector.
 }
 \examples{
 weighted.quant(x = mtcars$mpg, w = mtcars$wt,  q = seq(.1,.9,.1))

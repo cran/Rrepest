@@ -2,7 +2,7 @@
 % Please edit documentation in R/rrepest.R
 \name{Rrepest}
 \alias{Rrepest}
-\title{Rrepest}
+\title{Estimation using replicate weights}
 \usage{
 Rrepest(
   data,
@@ -17,60 +17,77 @@ Rrepest(
   fast = FALSE,
   tabl = FALSE,
   average = NULL,
-  group = NULL,
+  total = NULL,
+  coverage = FALSE,
+  invert_tests = FALSE,
+  save_arg = FALSE,
+  cores = NULL,
   ...
 )
 }
 \arguments{
-\item{data}{(dataframe) df to analyze}
+\item{data}{(data frame) Data to analyse}
 
-\item{svy}{(string) Possible projects to analyse.must be equal to ALL, IALS,
-IELS, PIAAC, PISA, PISA2015, PISAOOS, TALISSCH, TALISTCH .}
+\item{svy}{(string) Declares the survey settings. It must be equal to one of the following: ALL, IALS, ICCS, ICILS, IELS,
+PBTS, PIAAC, PIRLS, PISA, PISAOOS, PISA2015, SSES, SSES2023, SVY, TALISSCH, TALISTCH, TALISEC_LEADER, TALISEC_STAFF, TIMSS.}
 
-\item{est}{(est function) that takes arguments stimate, target variable, regressor (optional for linear regressions)}
+\item{est}{(est function) Specifies the estimates of interest. It has three arguments: statistics type, target variable and an (optional) regressor list in case of a linear regression.}
 
-\item{by}{(string vector) column in which we'll break down results}
+\item{by}{(string vector) Produces separate estimates by levels of the variable(s) specified by the string vector.}
 
-\item{over}{(vector string) columns over which to do analysis}
+\item{over}{(string vector) Requests estimates to be obtained separately for each level of categorical variable(s) identified by the string vector.}
 
-\item{test}{(bool) TRUE: will calculate the difference between over variables}
+\item{test}{(bool) if TRUE: Computes the difference between estimates obtained for the lowest and highest values of the 'over' variable(s).
+(See 'over' option above.) It is useful to test for differences between dependent samples (e.g. female-male).}
 
-\item{user_na}{(bool) TRUE: show nature of user defined missing values for by.var}
+\item{user_na}{(bool) if TRUE: Shows the nature of user defined missing values.}
 
-\item{show_na}{(bool) TRUE: include na in frequencies of x}
+\item{show_na}{(bool) if TRUE: Includes missing values (i.e. NAs) when estimating frequencies for the variable of interest.}
 
-\item{flag}{(bool) TRUE: Show NaN when there is not enough cases (or schools)}
+\item{flag}{(bool) if TRUE: Replaces estimation results that are based on fewer observations than required for reporting with NaN.
+When used with the PIAAC survey settings, it checks if each estimation result is based on at least 30 observations.
+When used with the PISA, PISAOOS, PISA2015 survey settings, it checks if each estimation result is based on at least 30 observations and 5 schools.
+When used with the TALISSCH survey settings, it checks if each estimation result is based on at least 10 schools.
+When used with the TALISTCH survey settings, it checks if each estimation result is based on at least 30 observations and 10 schools.}
 
-\item{fast}{(bool) TRUE: Only do 6 replicated weights}
+\item{fast}{(bool) if TRUE: Computes estimates by using only 6 replicated weights.}
 
-\item{tabl}{(bool) TRUE: Creates a flextable with all examples}
+\item{tabl}{(bool) if TRUE: Creates customisable and transferable tables using the flextable R package.}
 
-\item{average}{(grp function) that takes arguments group.name, column, cases to create averages at the end of df}
+\item{average}{(grp function) Computes an arithmetic average (or weighted average). It has three arguments: name of the average, column/variable used for computing the average, rows/observations included in the average.
+It has three arguments: name of the group, column/variable used for computing the group, rows/observations included in the group.}
 
-\item{group}{(grp function) that takes arguments group.name, column, cases to create groups at the end of df}
+\item{total}{(grp function) Computes an average weighted by the estimated size of the target population covered.}
 
-\item{...}{Optional filtering parameters: i.e.:
-isced = 2,
-n.pvs = 5,
-cm.weights = c("finw",paste0("repw",1:22))
-var.factor = 1/(0.5^2)
+\item{coverage}{(bool/numeric) TRUE: shows column next to se. Numeric: Shows NaN if bellow the set coverage.}
+
+\item{invert_tests}{(bool) Invert test columns from Rrepest test = TRUE by name on "b." and "se." in the column name and by sign (*-1) on "b."}
+
+\item{save_arg}{(bool) TRUE: returns a named list with the estimation data frame and all arguments used in Rrepest.}
+
+\item{cores}{(numeric) NULL: Will recruit max-1 cores when doing PVs. Else, will recruit the specified number of cores for PVs}
+
+\item{...}{Other optional parameters include:
+isced = Filters the data used for analysis by ISCED level (e.g. isced = 2),
+n.pvs = Customizes the number of plausible values used in the estimation (e.g. n.pvs = 5),
+cm.weights = Customizes the weights used in the estimation (e.g. cm.weights = c("finw",paste0("repw",1:22))),
+var.factor = Customizes the variance factor used in the estimation (e.g. var.factor = 1/(0.5^2)),
 z.score = qnorm(1-0.05/2)}
 }
 \value{
-Dataframe containing estimation "b." and standard error "se." of desired processes
+Data frame containing estimation "b." and standard error "se.".
 }
 \description{
 Estimates statistics using replicate weights (Balanced Repeated Replication (BRR) weights,
-Jackknife replicate weights,...), thus accounting for complex survey
-designs in the estimation of sampling variances. It is specially designed
-to be used with the data sets produced by the Organization for Economic Cooperation and Development (OECD),
-some of which include the Programme for International Student Assessment (PISA) and
-Teaching and Learning International Survey (TALIS) data sets, but works for all International Large Scale Assessments
-that use replicated weights.  It also allows for
-analyses with multiply imputed variables (plausible values); where
-plausible values are included in a pvvarlist, the average estimator
-across plausible values is reported and the imputation error is added to
-the variance estimator.
+Jackknife replicate weights,...), thus accounting for complex survey designs in the estimation
+of sampling variances. It is designed specifically to be used with the data sets produced by
+the Organization for Economic Cooperation and Development (OECD), some of which include the
+Programme for the International Assessment of Adult Competencies (PIAAC), Programme for
+International Student Assessment (PISA) and Teaching and Learning International Survey (TALIS)
+data sets, but works for any educational large-scale assessment and survey that uses replicated
+weights. It also allows for analyses with multiply imputed variables (plausible values);
+where plausible values are used, average estimator across plausible values is reported and
+the imputation error is added to the variance estimator.
 }
 \examples{
 data(df_pisa18)

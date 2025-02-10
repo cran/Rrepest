@@ -2,22 +2,22 @@
 % Please edit documentation in R/weighted_sdev.R
 \name{weighted.std}
 \alias{weighted.std}
-\title{Weighted Standard Deviation}
+\title{Weighted standard deviation}
 \usage{
 weighted.std(x, w, na.rm = TRUE)
 }
 \arguments{
-\item{x}{(numeric vector) variable to analyze}
+\item{x}{(numeric vector) Variable of interest for which to compute the standard deviation.}
 
-\item{w}{(numeric vector) vector of weights}
+\item{w}{(numeric vector) Vector with the weights.}
 
-\item{na.rm}{(bool) if TRUE remove missing values.}
+\item{na.rm}{(bool) if TRUE: Excludes missing values before computing the standard deviation}
 }
 \value{
-Scalar with Variance or Standard Deviation
+Scalar containing the standard deviation
 }
 \description{
-Calculate the standard deviation of a numeric vector
+Computes the weighted standard deviation of a numeric vector.
 }
 \examples{
 data(df_talis18)

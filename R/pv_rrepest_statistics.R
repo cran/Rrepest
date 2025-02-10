@@ -47,6 +47,8 @@ pv.brr.stat.by <- function(df, statistic = "mean",x, w, by.var, over, test, n.df
       separate("by.group",into = all_of(by.var), sep = "\\|" )
   }
   
+
+  
   
   #------ If test for over add tests to res.col
   if (test) {
@@ -89,7 +91,8 @@ pv.brr.stat.by.PAR <- function(df, statistic = "mean",x, w, by.var, over, test, 
   # STATISTICS --------------------------------------------------------------.
   if(statistic == "quant") {res.col <- summarise(res.col, w.quant = arg$weighted.quant(get(x),get(w),arg$q.iqr))}
   else if(statistic == "iqr") {res.col <- summarise(res.col, w.iqr = arg$weighted.iqr(get(x),get(w),arg$q.iqr))}
-  else if(statistic == "mean") {res.col <- summarise(res.col, w.mean = weighted.mean(get(x),get(w),na.rm = T))}
+  else if(statistic %in% c("mean","means")) {res.col <- summarise(res.col, w.mean = weighted.mean(get(x),get(w),na.rm = T))}
+  else if(statistic %in% c("meanpct","meanspct")) {res.col <- summarise(res.col, w.mean = weighted.mean(get(x),get(w),na.rm = T)*100)}
   else if(statistic == "var") {res.col <- summarise(res.col, w.var = arg$weighted.var(get(x),get(w),na.rm = T))}
   else if(statistic %in% c("std","sd")) {res.col <- summarise(res.col, w.std = arg$weighted.std(get(x),get(w),na.rm = T))}
   
@@ -164,7 +167,7 @@ pv.loop.stat.on.weights <- function (data, statistic = "mean", rep_weights,
                           .export = c("pv.brr.stat.by.PAR",
                                       "weighted.std","weighted.var",
                                       "weighted.quant","weighted.iqr",
-                                      "flags","over.test")) %dopar% {
+                                      "flags","over.test","...")) %dopar% {
                                         
                                         #Filter on only non NA values move here due to performance
                                         data.par <- na.omit(data.par, cols = x)
@@ -183,7 +186,8 @@ pv.loop.stat.on.weights <- function (data, statistic = "mean", rep_weights,
                                                     weighted.quant = weighted.quant,
                                                     weighted.iqr = weighted.iqr,
                                                     flags = flags,
-                                                    over.test = over.test)
+                                                    over.test = over.test,
+                                                    ... = ...)
                                       }
     
     
@@ -196,7 +200,7 @@ pv.loop.stat.on.weights <- function (data, statistic = "mean", rep_weights,
   
 
 pv.brr.gstats <- function(data, svy, x, by.var, statistic = "mean",
-                          over, test, flag, fast, pv = F,...) {
+                          over, test, flag, fast, pv = F, ...) {
   # Note: Same as rrepest.gstats without the number of schools and teachers
   # Goal: Dataframe with statistic and SE by Fay's BRR model
   # ------ INPUTS ------.
@@ -226,6 +230,7 @@ pv.brr.gstats <- function(data, svy, x, by.var, statistic = "mean",
   } else {
     n.df <- list()
   }
+  
   
   # Loop over weights
   brr.res <- pv.loop.stat.on.weights(data = data,
@@ -277,8 +282,8 @@ pv.brr.gstats <- function(data, svy, x, by.var, statistic = "mean",
 
 
 pv.rrepest.statistics <- function(data, svy, statistic = "mean", x, by.var = NULL,
-                               over = NULL, test = F, flag = F, user_na=F, 
-                               fast = F, pv = F, ...) {
+                               over = NULL, test = FALSE, flag = FALSE, user_na=FALSE, 
+                               fast = FALSE, pv = FALSE, ...) {
   # Goal: Dataframe with statistic and SE by Fay's BRR model
   # Note: All formatting depends on higher function
   # ------ INPUTS ------.
@@ -318,8 +323,8 @@ pv.rrepest.statistics <- function(data, svy, statistic = "mean", x, by.var = NUL
       results <- append(results, list(
         pv.brr.gstats(data = data, svy = svy, x = x,by.var = by.over, 
                    statistic = "quant", test = test, over = over, flag = flag,
-                   fast = fast, pv = pv,
-                   q.iqr = stats_rr[i+1] %>% as.numeric(),...) )
+                   fast = fast, pv = pv, 
+                   q.iqr = stats_rr[i+1] %>% as.numeric(), ...) )
       )
       
     }else if (stats_rr[i] == "iqr"){
@@ -329,7 +334,7 @@ pv.rrepest.statistics <- function(data, svy, statistic = "mean", x, by.var = NUL
       results <- append(results, list(
         pv.brr.gstats(data = data, svy = svy, x = x, by.var = by.over, 
                    statistic = "iqr", test = test, over = over, flag = flag,
-                   fast = fast, pv = pv,
+                   fast = fast, pv = pv, 
                    q.iqr = c(stats_rr[i+1] %>% as.numeric(),
                              stats_rr[i+2] %>% as.numeric()),...) )
       )
@@ -339,7 +344,7 @@ pv.rrepest.statistics <- function(data, svy, statistic = "mean", x, by.var = NUL
       results <- append(results, list(
         pv.brr.gstats(data = data, svy = svy, x = x, by.var = by.over,
                    test = test, over = over, flag = flag,
-                   fast = fast, pv = pv,
+                   fast = fast, pv = pv, 
                    statistic = stats_rr[i],...))
       )
     }

@@ -1,11 +1,11 @@
-#' Weighted Interquantile Range
+#' Weighted inter-quantile range
 #'
-#' @description Compute interquantile range
-#' @param x (numeric vector) variable from where to get quantiles
-#' @param w (numeric vector) vector of weights
-#' @param rang (numeric vector) two numbers indicating the range of the quantiles
+#' @description Computes the weighted inter-quantile range of a numeric vector.
+#' @param x (numeric vector) Variable of interest for which to compute the inter-quantile range
+#' @param w (numeric vector) Vector with the weights
+#' @param rang (numeric vector) Two numbers between 0 and 1 indicating the desired inter-quantile range
 #'
-#' @return Interquantile range
+#' @return Scalar containing the inter-quantile range
 #' @export
 #'
 #' @examples

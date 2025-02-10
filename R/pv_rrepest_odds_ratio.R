@@ -1,37 +1,17 @@
-################# Functionalize Linear regression an PVs #################
-# 4 April 2023
+################# Functionalize Logistic Regression an PVs #################
+# 27 December 2024
 # Rodolfo Ilizaliturri
 #############################################################
-# Goal: Obtain coefficients and R2 drom regression model with greater speed
+# Goal: Obtain coefficients from logistic regression model in the form of Odds Ratio with greater speed
 
-#' Format continuous variables as numeric for Rrepest
-#'
-#' @param df (data frame) Data to be analysed.
-#' @param cont.vars (string vector) continuous variables for analysis
-#'
-#' @return Data frame with cantinuous variables converted to numeric for a continuous analysis (means, regression, etc.)
-#' @export
-#'
-#' @examples format_data_cont_vars(mtcars,"hp")
-format_data_cont_vars <- function(df, cont.vars) {
-  # Goal: Converts to numeric all variables for a continuous analysis (means, regression, etc.)
-  # ------ INPUTS ------.
-  # data : (dataframe) df to analyze
-  # cont.vars : (string vector) continuous variables for analysis
-  
-  df.res <- df %>% 
-    mutate(across(contains(cont.vars) & ( where(is.labelled)), remove_user_na, user_na_to_na = T)) %>%
-    mutate(across(contains(cont.vars), as.numeric))
-  
-  return(df.res)
-}
-pv.do.lm <- function(df, x, y, by.var, w, ...){
-  # Goal: Get coefficients and r2 from linear regression
+
+pv.do.odr <- function(df, x, y, by.var, w, ...){
+  # Goal: Get coefficients from logistic regression odds ratio
   # ------ INPUTS ------.
   # df : (dataframe) df to analyze previosly formated
   # by.var : (string) column in which we'll break down results !IOP!: several variables
   # x : (string vector) independant variable (1+)
-  # y : (string) dependant variable (just 1)
+  # y : (string) dependant variable (just 1). Must have valus betweeen 0 and 1.
   # w : (string) weighting variable (just 1)
   
   
@@ -51,41 +31,38 @@ pv.do.lm <- function(df, x, y, by.var, w, ...){
   
   
   
-  #model only fitting values. Out: Coeff and R2 ONLY
+  #model only fitting values. Out: Coeff ONLY
   res.df <- df.reg %>% 
     group_by(across(all_of(by.var))) %>% 
     do({
-      model <- lm.wfit(x = .[c('intercept', x)] %>% as.matrix(),
+      # Converting each weight to a proportion
+      weight_vec <- .[w] %>% as.matrix() %>% as.vector()
+      # Weights parameter represents the proportion of the total for each row (i.e. when the wight column sums up to one). 
+      weight_proportion <- weight_vec / sum(weight_vec,na.rm = TRUE)
+      # Logistic regression from family binomial
+      model <- glm.fit(x = .[c('intercept', x)] %>% as.matrix(),
                        y = .[y] %>% as.matrix(),
-                       w = .[w] %>% as.matrix() %>% as.vector())
-      
-      #R2
-      Y <- .[y] %>% as.matrix()
-      W <- .[w] %>% as.matrix() %>% as.vector()
-      
-      ssr <- weighted.var(Y-resid(model),W)
-      sst <- weighted.var(Y,W)
-      r2 <- ssr/sst
-      
+                       weights = weight_proportion, 
+                       family = quasibinomial())
+      # Get coefficients and covert to data.frame
       model %>% 
         coefficients() %>% 
         t() %>% 
-        as.data.frame() %>% 
-        add_column(rsqr = r2)
-      
+        # exp() %>% #Odds Ratio changed for Delta Method
+        as.data.frame()
     }
     ) %>%
     ungroup()
   
   return(res.df)
 }
-pv.do.lm.PAR <- function(df, x, y, by.var, w, ...){
-  # Goal: Get coefficients and r2 from linear regression
+pv.do.odr.PAR <- function(df, x, y, by.var, w, ...){
+  # Goal: Get coefficients from logistic regression Odds Ratio
   # ------ INPUTS ------.
   # df : (dataframe) df to analyze previosly formated
   # by.var : (string) column in which we'll break down results !IOP!: several variables
   # x : (string vector) independant variable (1+)
-  # y : (string) dependant variable (just 1)
+  # y : (string) dependant variable (just 1). Must have valus betweeen 0 and 1.
   # w : (string) weighting variable (just 1)
   # ...
   #(functions) weighted.var
@@ -109,36 +86,33 @@ pv.do.lm.PAR <- function(df, x, y, by.var, w, ...){
   
   
   
-  #model only fitting values. Out: Coeff and R2 ONLY
+  #model only fitting values. Out: Coeff ONLY
   res.df <- df.reg %>% 
     group_by(across(all_of(by.var))) %>% 
     do({
-      model <- lm.wfit(x = .[c('intercept', x)] %>% as.matrix(),
+      # Converting each weight to a proportion
+      weight_vec <- .[w] %>% as.matrix() %>% as.vector()
+      # Weights parameter represents the proportion of the total for each row (i.e. when the wight column sums up to one). 
+      weight_proportion <- weight_vec / sum(weight_vec,na.rm = TRUE)
+      # Logistic regression from family binomial
+      model <- glm.fit(x = .[c('intercept', x)] %>% as.matrix(),
                        y = .[y] %>% as.matrix(),
-                       w = .[w] %>% as.matrix() %>% as.vector())
-      
-      #R2
-      Y <- .[y] %>% as.matrix()
-      W <- .[w] %>% as.matrix() %>% as.vector()
-      
-      ssr <- arg$weighted.var(Y-resid(model),W)
-      sst <- arg$weighted.var(Y,W)
-      r2 <- ssr/sst
-      
+                       weights = weight_proportion, 
+                       family = quasibinomial())
+      # Get coefficients and covert to data.frame
       model %>% 
         coefficients() %>% 
         t() %>% 
-        as.data.frame() %>% 
-        add_column(rsqr = r2)
-      
+        # exp() %>% #Odds Ratio changed for Delta Method
+        as.data.frame()
     }
     ) %>%
     ungroup()
   
   return(res.df)
 }
-pv.loop.lm.on.weights <- function (data, x, y, by.var, over, test = F, flag = F,
-                                   svy, rep_weights, fast = F, pv = F, ...) {
+pv.loop.odr.on.weights <- function (data, x, y, by.var, over, test = F, flag = F,
+                                       svy, rep_weights, fast = F, pv = F, ...) {
   # Goal: Regression model results for each weight
   # ------ INPUTS ------.
   # data : (dataframe) df to analize
@@ -158,7 +132,7 @@ pv.loop.lm.on.weights <- function (data, x, y, by.var, over, test = F, flag = F,
     
     res.l <- lapply(rep_weights, function(w.i){
       #Do lm, add weight to colnames, append new data of results to list
-      res.df <- pv.do.lm(data, x, y, all_of(c(by.var,over)), w.i) %>% 
+      res.df <- pv.do.odr(data, x, y, all_of(c(by.var,over)), w.i) %>% 
         unite("by.var", all_of(c(by.var,over)), sep = "|")
       
       # Change col names to include weight name
@@ -170,22 +144,22 @@ pv.loop.lm.on.weights <- function (data, x, y, by.var, over, test = F, flag = F,
   }else{
     res.l <- foreach(w.i = rep_weights,
                      .packages = c("dplyr","tidyr","data.table","tibble"),
-                     .export = c("pv.do.lm.PAR","n.obs.x",
+                     .export = c("pv.do.odr.PAR","n.obs.x",
                                  "weighted.var","...")) %dopar% {
                                    
-                                   res.df <- pv.do.lm.PAR(data.par,
-                                                          x,
-                                                          y,
-                                                          all_of(c(by.var,over)),
-                                                          w.i,
-                                                          weighted.var = weighted.var,
-                                                          ...=...) %>% 
+                                   res.df <- pv.do.odr.PAR(data.par,
+                                                              x,
+                                                              y,
+                                                              all_of(c(by.var,over)),
+                                                              w.i,
+                                                              weighted.var = weighted.var,
+                                                              ...=...) %>% 
                                      unite("by.var", all_of(c(by.var,over)), sep = "|")
                                    return(res.df)
                                  }
     
   }
-    
+  
   
   # ---------------- FLAGS
   if (flag) {
@@ -235,10 +209,10 @@ pv.loop.lm.on.weights <- function (data, x, y, by.var, over, test = F, flag = F,
     })
   }
   # ---------------- .
-  # ---------------- ASSIGN reg_{name.of.y} to each dataframe
+  # ---------------- ASSIGN odds_{name.of.y} to each dataframe
   res.l <- lapply(res.l, function(res.i){
     res.i <- res.i
-    colnames(res.i)[-1] <- paste0("reg_", y,".", colnames(res.i)[-1])
+    colnames(res.i)[-1] <- paste0("odr_", y,".", colnames(res.i)[-1])
     return(res.i)
   })
   
@@ -246,18 +220,18 @@ pv.loop.lm.on.weights <- function (data, x, y, by.var, over, test = F, flag = F,
 }
 
 
-# --------- FINAL LINEAR MODEL FUNCTION
+# --------- FINAL LOGISTIC MODEL ODDS RATIO FUNCTION
 
-pv.rrepest.lm <- function(data,  svy, x, y, by.var = NULL, over = NULL, test = F, 
-                       user_na=F, flag = F, fast = F, pv = F, ...) {
-  # Goal: Dataframe with β and SE by Fay's BRR model for linear regression
+pv.rrepest.odr <- function(data,  svy, x, y, by.var = NULL, over = NULL, test = F, 
+                              user_na=F, flag = F, fast = F, pv = F, ...) {
+  # Goal: Dataframe with β and SE by Fay's BRR model for logistic regression Odds Ratios
   # ------ INPUTS ------.
   # data : (dataframe) df to analyze
   # svy : List of possible projects to analyse PIAAC, PISA, TALISSCH and TALISTCH
   # isced : (number) isced level to analyze
   # by.var : (string) column in which we'll break down results
   # x : (string vector) independant variable (1+)
-  # y : (string) dependant variable (just 1)
+  # y : (string) dependant variable (just 1). Must have values between 0 and 1.
   # user_na : (Bool) TRUE → show nature of user defined missing values in by.var
   # over : (vector string) columns over which to do analysis
   # test : (bool) If TRUE will calculate the difference between over variables
@@ -280,18 +254,18 @@ pv.rrepest.lm <- function(data,  svy, x, y, by.var = NULL, over = NULL, test = F
   # Get weight names
   weight.names <- replicated_w_names(svy, ...)
   
-  # Loop over each variable
-  brr.res <- pv.loop.lm.on.weights(data = data,
-                                x = x,
-                                y = y,
-                                svy = svy,
-                                by.var = by.var,
-                                over = over,
-                                test = test,
-                                flag = flag,
-                                rep_weights = weight.names,
-                                fast = fast,
-                                pv = pv)
+  # Loop over each variable 
+  brr.res <- pv.loop.odr.on.weights(data = data,
+                                       x = x,
+                                       y = y,
+                                       svy = svy,
+                                       by.var = by.var,
+                                       over = over,
+                                       test = test,
+                                       flag = flag,
+                                       rep_weights = weight.names,
+                                       fast = fast,
+                                       pv = pv)
   
   # Reorder data to have b and se intertwined
   res <- pv.get.se.reorder(brr.res, svy = svy, pv = pv, ... = ...)

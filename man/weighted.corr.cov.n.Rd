@@ -2,7 +2,7 @@
 % Please edit documentation in R/weighted_multivariate_corr_cov.R
 \name{weighted.corr.cov.n}
 \alias{weighted.corr.cov.n}
-\title{Multivariate Correlation and Covariance}
+\title{Multivariate correlation and covariance}
 \usage{
 weighted.corr.cov.n(
   data,
@@ -13,25 +13,25 @@ weighted.corr.cov.n(
 )
 }
 \arguments{
-\item{data}{(dataframe) data to analyze}
+\item{data}{(data frame) Data to analyse}
 
-\item{x}{(vector string) variables names from where to get correlation/covariance}
+\item{x}{(string vector) Variables of interest for which to compute the correlation/covariance}
 
-\item{w}{(string) weight name}
+\item{w}{(string) Name of the numeric variable representing the weights}
 
-\item{corr}{(bool) True: get correlation. False: get covariance}
+\item{corr}{(bool) if TRUE: Computes correlation; if FALSE: Computes covariance}
 
-\item{na.rm}{(bool) True: NAs be stripped before computation proceeds}
+\item{na.rm}{(bool) if TRUE: Excludes missing values before computing the correlation/covariance.}
 }
 \value{
-Dataframe containing 2 Choose length(x) columns with each bivariate correlation/covariance
+Data frame containing each pairwise bivariate correlation/covariance
 }
 \description{
-Multivariate Correlation and Covariance
+Computes multivariate correlation and covariance for the variables of interest.
 }
 \examples{
 data(df_talis18)
 
-weighted.corr.cov.n(df_talis18,c("T3STAKE","T3TEAM","T3STUD"),"TCHWGT")
+weighted.corr.cov.n(df_talis18,c("t3stake","t3team","t3stud"),"tchwgt")
 
 }

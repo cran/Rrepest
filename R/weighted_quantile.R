@@ -1,11 +1,11 @@
-#' Weighted Quantile
-#' @description
-#' Computation of weighted quantiles
-#' @param x (numeric vector) variable from where to get quantiles
-#' @param w (numeric vector) vector of weights
-#' @param q (numeric vector) From 0 to 1 (exclusive) for the quantile desired
+#' Weighted quantile
+#' 
+#' @description Computes weighted quantiles of a numeric vector.
+#' @param x (numeric vector) Variable of interest for which to compute the quantile
+#' @param w (numeric vector) Vector with the weights
+#' @param q (numeric vector) A number between 0 and less than 1 indicating the desired quantile
 #'
-#' @return Weighted quantile of a numeric vector
+#' @return Scalar containing the quantile
 #' @export
 #'
 #' @examples

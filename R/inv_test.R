@@ -12,6 +12,7 @@
 #' @export
 #'
 #' @examples
+#' inv_test(rrepest_pisa_age_gender, name_index = 6) 
 inv_test <- function(data, name_index){
   # Goal: Invert test column from Rrepest by name on b. and se. in the test part in the column name and by sign (*-1) on b.
   # ------ INPUTS ------.

@@ -2,22 +2,22 @@
 % Please edit documentation in R/weighted_iqr.R
 \name{weighted.iqr}
 \alias{weighted.iqr}
-\title{Weighted Interquantile Range}
+\title{Weighted inter-quantile range}
 \usage{
 weighted.iqr(x, w = rep(1, length(x)), rang = c(0.25, 0.75))
 }
 \arguments{
-\item{x}{(numeric vector) variable from where to get quantiles}
+\item{x}{(numeric vector) Variable of interest for which to compute the inter-quantile range}
 
-\item{w}{(numeric vector) vector of weights}
+\item{w}{(numeric vector) Vector with the weights}
 
-\item{rang}{(numeric vector) two numbers indicating the range of the quantiles}
+\item{rang}{(numeric vector) Two numbers between 0 and 1 indicating the desired inter-quantile range}
 }
 \value{
-Interquantile range
+Scalar containing the inter-quantile range
 }
 \description{
-Compute interquantile range
+Computes the weighted inter-quantile range of a numeric vector.
 }
 \examples{
 weighted.iqr(x = mtcars$mpg, w = mtcars$wt,  rang = c(.5,.9))

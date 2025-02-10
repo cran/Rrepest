@@ -1,18 +1,19 @@
-#' Multivariate Correlation and Covariance
+#' Multivariate correlation and covariance
 #'
-#' @param data (dataframe) data to analyze
-#' @param x (vector string) variables names from where to get correlation/covariance
-#' @param w (string) weight name
-#' @param corr (bool) True: get correlation. False: get covariance
-#' @param na.rm (bool) True: NAs be stripped before computation proceeds
+#' @description Computes multivariate correlation and covariance for the variables of interest.
+#' @param data (data frame) Data to analyse
+#' @param x (string vector) Variables of interest for which to compute the correlation/covariance
+#' @param w (string) Name of the numeric variable representing the weights
+#' @param corr (bool) if TRUE: Computes correlation; if FALSE: Computes covariance
+#' @param na.rm (bool) if TRUE: Excludes missing values before computing the correlation/covariance.
 #'
-#' @return Dataframe containing 2 Choose length(x) columns with each bivariate correlation/covariance
+#' @return Data frame containing each pairwise bivariate correlation/covariance
 #' @export
 #'
 #' @examples
 #' data(df_talis18)
 #' 
-#' weighted.corr.cov.n(df_talis18,c("T3STAKE","T3TEAM","T3STUD"),"TCHWGT")
+#' weighted.corr.cov.n(df_talis18,c("t3stake","t3team","t3stud"),"tchwgt")
 #' 
 weighted.corr.cov.n <- function(data, x, w =  rep(1, length(data[x[1]])), corr = TRUE, na.rm = TRUE) {
   # Goal: Get weighted correlation or covariance of n variables

@@ -1,11 +1,11 @@
-#' Weighted Standard Deviation
+#' Weighted standard deviation
 #' 
-#' @description Calculate the standard deviation of a numeric vector
-#' @param x (numeric vector) variable to analyze
-#' @param w (numeric vector) vector of weights
-#' @param na.rm (bool) if TRUE remove missing values.
+#' @description Computes the weighted standard deviation of a numeric vector.
+#' @param x (numeric vector) Variable of interest for which to compute the standard deviation.
+#' @param w (numeric vector) Vector with the weights.
+#' @param na.rm (bool) if TRUE: Excludes missing values before computing the standard deviation
 #'
-#' @return Scalar with Variance or Standard Deviation
+#' @return Scalar containing the standard deviation
 #' @export
 #'
 #' @examples 

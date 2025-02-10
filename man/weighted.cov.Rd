@@ -2,27 +2,27 @@
 % Please edit documentation in R/weighted_covariance.R
 \name{weighted.cov}
 \alias{weighted.cov}
-\title{Weighted Bivariate Covariance}
+\title{Weighted bivariate covariance}
 \usage{
 weighted.cov(x, y, w, na.rm = TRUE)
 }
 \arguments{
-\item{x}{(numeric vector) variable from where to get covariance}
+\item{x}{(numeric vector) Variable of interest x for computing the covariance}
 
-\item{y}{(numeric vector) variable from where to get covariance}
+\item{y}{(numeric vector) Variable of interest y for computing the covariance}
 
-\item{w}{(numeric vector) vector of weights}
+\item{w}{(numeric vector) Vector with the weights}
 
-\item{na.rm}{(bool) True: NAs be stripped before computation proceeds}
+\item{na.rm}{(bool) if TRUE: Excludes missing values before computing the covariance}
 }
 \value{
-Pearson correlation coefficient
+Scalar containing the covariance
 }
 \description{
-Compute weighted covariance coefficient of two numeric vectors
+Computes the weighted covariance coefficient of two numeric vectors.
 }
 \examples{
 data(df_talis18) 
 
-weighted.cov(x = df_talis18$T3STAKE, y = df_talis18$T3TEAM, w = df_talis18$TCHWGT)
+weighted.cov(x = df_talis18$t3stake, y = df_talis18$t3team, w = df_talis18$tchwgt)
 }

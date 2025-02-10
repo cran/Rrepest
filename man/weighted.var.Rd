@@ -7,17 +7,17 @@
 weighted.var(x, w, na.rm = TRUE)
 }
 \arguments{
-\item{x}{(numeric vector) variable to analyze}
+\item{x}{(numeric vector) Variable of interest for which to compute the variance}
 
-\item{w}{(numeric vector) vector of weights}
+\item{w}{(numeric vector) Vector with weights}
 
-\item{na.rm}{(bool) if TRUE remove missing values.}
+\item{na.rm}{(bool) if TRUE: Excludes missing values before computing the variance}
 }
 \value{
-Scalar with Variance or Standard Deviation
+Scalar containing the variance
 }
 \description{
-Calculate the weighted variance numeric vector
+Computes the weighted variance of a numeric vector.
 }
 \examples{
 data(df_talis18) 

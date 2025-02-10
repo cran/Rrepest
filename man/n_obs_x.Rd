@@ -2,30 +2,27 @@
 % Please edit documentation in R/n_obs_x.R
 \name{n_obs_x}
 \alias{n_obs_x}
-\title{Number of observations valid for column x}
+\title{Number of valid (i.e. non-missing) observations for column/variable x}
 \usage{
 n_obs_x(df, by, x, svy = NULL)
 }
 \arguments{
-\item{df}{(dataframe) data to analyze}
+\item{df}{(data frame) Data to analyse with lowercase column names.}
 
-\item{by}{(string vector) column by which we'll break down results}
+\item{by}{(string vector) Variable(s) used for tabulating the variable of interest}
 
-\item{x}{(string) variable from where to get means}
+\item{x}{(string) Variable of interest for which to compute the number of valid (i.e. non-missing) observations}
 
-\item{svy}{(string) Possible projects to analyse.must be equal to ALL, IALS,
-IELS, PIAAC, PISA, PISA2015, PISAOOS, TALISSCH, TALISTCH}
+\item{svy}{(string) Survey settings that must be equal to one of the following: ALL, IALS, ICCS, ICILS, IELS,
+PBTS, PIAAC, PIRLS, PISA, PISAOOS, PISA2015, SSES, SSES2023, SVY, TALISSCH, TALISTCH, TALISEC_LEADER, TALISEC_STAFF, TIMSS}
 }
 \value{
-Dataframe containing the number of observations valid for the target variable x
+Data frame containing the number of valid (i.e. non-missing) observations for the variable of interest
 }
 \description{
-Number of observations valid for column x
+Computes the number of valid (i.e. non-missing) observations for the column/variable of interest.
 }
 \examples{
-data(df_pisa18)
-data(df_talis18) 
-
 n_obs_x(df = df_pisa18, by = "cnt",x = "wb173q03ha", svy = "PISA2015")
 n_obs_x(df = df_talis18, by = "cntry",x = "tt3g01", svy = "TALISTCH")
 }

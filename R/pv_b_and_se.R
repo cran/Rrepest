@@ -22,14 +22,15 @@ get.common.name <- function(str.vec, pv.inputs) {
       paste0(collapse = "+")
     
     # Use the re exp instruction
-    res <- gsub(reg.inst,
-    # Replace with separated parts plus the @ symbol in place
-                paste0(unlist(strsplit(pv.in.i, "(?<=@)|(?=@)", perl=TRUE)),collapse = ""),
-                str.vec[1])
+    str.vec <- gsub(reg.inst,
+                    # Replace with separated parts plus the @ symbol in place
+                    paste0(unlist(strsplit(pv.in.i, "(?<=@)|(?=@)", perl=TRUE)),collapse = ""),
+                    str.vec)
     
   }
   
-  return(res)
+  return(str.vec[1])
+  
 }
 #Ex. get.common.name(get.pv.names(names(df.qqq), "pv@math"))
 
@@ -50,9 +51,10 @@ b.se.pv <- function(res.l, pv.inputs, statistic){
     if (startsWith(c.names[n.i],"b.")) {
       # Grab first element and n.i element of each df
       df.b <- lapply(res.l, function(df.i) df.i[c(1,n.i)]) %>% 
-        reduce(full_join, by = "by.var") %>% 
+        reduce(full_join, by = "by.var") #%>% 
+      #Note for later: this should be done only for frequencies!
       # When there are missing values depending on the pv # replace NA with 0 
-        replace(is.na(.),0)
+        #replace(is.na(.),0)
       # Get the common name an all to use as variable name
       name.b <- get.common.name(names(df.b)[-1],pv.inputs)
       

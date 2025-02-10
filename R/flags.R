@@ -23,7 +23,7 @@ flags <- function(data, svy) {
     #remove last columns
     res.df <- res.df[-c(length(data))]
     res.df[ncol(res.df)] <- labelled_spss(res.df[[names(res.df)[ncol(res.df)]]], c(flagged = NaN)) %>% as.data.frame()
-  }else if (svy == "TALISTCH"){
+  }else if (svy %in% c("TALISTCH","TALISEC_STAFF")){
     #If teachers questionnaire check for schools and teachers to add NaN
     res.df <- data %>% 
       mutate_if(is.numeric, list(~ifelse(

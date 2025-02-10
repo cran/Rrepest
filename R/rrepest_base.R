@@ -1,7 +1,8 @@
 #Rrepest Isolated for one database (group)
 
 rrepest_base <- function(data, svy, est, by = NULL, over = NULL,
-                    test = FALSE, user_na= FALSE, show_na= FALSE, flag = FALSE, fast = FALSE, ...) {
+                    test = FALSE, user_na= FALSE, show_na= FALSE, flag = FALSE, 
+                    fast = FALSE, cores = NULL,...) {
   # Goal: Dataframe with statistics for TALIS
   # ------ INPUTS ------.
   ######### WHO ######### 
@@ -9,7 +10,7 @@ rrepest_base <- function(data, svy, est, by = NULL, over = NULL,
   # svy : List of possible projects to analyse TALISSCH and TALISTCH
   ######### WHAT ######### 
   # est : (est function) that takes arguments what = estimate, tgt = target, rgr = regressor
-  # what : (string vector) accepts "mean","var","std", "quant", "iqr", "freq", "lm", "corr", "cov"
+  # what : (string vector) accepts "mean","var","std", "quant", "iqr", "freq", "lm", "log", "corr", "cov"
   # tgt : (string vector) variable from where to get frequencies
   # rgr : (string vector) independant variable for regression (1+)
   ######### WHERE ######### 
@@ -21,18 +22,17 @@ rrepest_base <- function(data, svy, est, by = NULL, over = NULL,
   # show_na : (Bool) TRUE → include na in frequencies of x 
   # flag : (Bool) TRUE → Show NaN when there is not enough cases (or schools)
   # fast : (Bool) TRUE → Only do 6 replicated weights
-  # cool : (Bool) TRUE → Creates a flextable with all examples
   # ...
   # isced : (number) isced level to analyze
   
   
   # Argument renaming to be adapted in v2 -----------------------------------
   
+  
   by.var <- by
   what <- est$what
   tgt <- est$tgt
   rgr <- est$rgr
-  
   
   # Groups ------------------------------------------------------------------
   # if (!is.null(group)) {
@@ -64,6 +64,12 @@ rrepest_base <- function(data, svy, est, by = NULL, over = NULL,
     by.var <- "tot.df"
   }
   
+  # TEST: Remove NAs from last variable in over, to avoid yy..(xx-NA) --------.
+  if (test){
+    data <- data %>% 
+      drop_na(all_of(over[length(over)])) 
+  }
+  
   
   #GENERAL option: If what is not "gen" convert to lowercase (might be functions in upper case)
   if (!("gen" %in% what))  {
@@ -77,7 +83,7 @@ rrepest_base <- function(data, svy, est, by = NULL, over = NULL,
   # Formatting depending on continuous or categorical tgt
   if ("freq" %in% what) {
     # Data formatting
-    df <- format.data.repest(df = data,
+    df <- format_data_repest(df = data,
                              svy = svy,
                              x = NULL, 
                              # all arguments with an @ get converted into pvs
@@ -97,13 +103,13 @@ rrepest_base <- function(data, svy, est, by = NULL, over = NULL,
     
     
     # # X is categorical in a frequency, must be formatted accordingly
-    # df <- format.data.categ.vars(df,
+    # df <- format_data_categ_vars(df,
     #                              get.pv.arguments(pv.digits, tgt),
     #                              show_na)
   } 
   else if (!("gen" %in% what)) {
     # Data formatting
-    df <- format.data.repest(df = data,
+    df <- format_data_repest(df = data,
                              svy = svy,
                              x = NULL, 
                              # all arguments with an @ get converted into pvs
@@ -120,7 +126,7 @@ rrepest_base <- function(data, svy, est, by = NULL, over = NULL,
     }
     
     # Format continuous vars
-    df <- format.data.cont.vars(df, cont.vars = get.pv.arguments(pv.digits, c(tgt,rgr)))
+    df <- format_data_cont_vars(df, cont.vars = get.pv.arguments(pv.digits, c(tgt,rgr)))
   }
   
   
@@ -136,7 +142,14 @@ rrepest_base <- function(data, svy, est, by = NULL, over = NULL,
     else {data.par <- as.data.table(data)}
     
     # Set up cluster working nodes and what they have to know
-    cl <- makeCluster(max(detectCores()-1,1))
+    if(is.null(cores)){
+      # If NULL, action the max of cores minus 1
+      cl <- makeCluster(max(detectCores()-1,1))
+    } else {
+      # If no null, set the minimum between the set number and max-1
+      cl <- makeCluster(min(detectCores()-1,cores))
+    }
+    
     clusterExport(cl, "data.par",envir = environment())
     doParallel::registerDoParallel(cl)
   }
@@ -158,8 +171,8 @@ rrepest_base <- function(data, svy, est, by = NULL, over = NULL,
       #-------------- STATISTICS --------------.
       # If there is something else than freq
       if(any(c("mean","means","meanpct","meanspct","var","std", "sd", "quant", "iqr") %in% what )){
-        # remove "lm" and "freq"
-        what.statistic <- what[! what %in% c("lm","freq","corr","cov")]
+        # remove "log","lm" and "freq"
+        what.statistic <- what[! what %in% c("lm","log","freq","corr","cov")]
         
         # if flag show.n as "flag"
         if (flag) {show.n = "flag"} else {show.n = "n"}
@@ -168,7 +181,8 @@ rrepest_base <- function(data, svy, est, by = NULL, over = NULL,
         res.stats <- 
           pv.rrepest.statistics(data = df, svy = svy, statistic = what.statistic,
                                 x = tgt.i, by.var = by.var,over = over, test = test,
-                                flag = flag, user_na = user_na, fast = fast, pv = pv, ...)
+                                flag = flag, user_na = user_na, fast = fast, pv = pv,
+                                ...)
         
         # Rename to by.var first column to merge all results
         colnames(res.stats)[1] <- "by.var"
@@ -206,6 +220,31 @@ rrepest_base <- function(data, svy, est, by = NULL, over = NULL,
         
         # Append result of regression to list of results
         res.tgt.i <- append(res.tgt.i, list(res.lm))
+      }
+      #---------------------------------------.
+      
+      #-------------- LOGISTIC REGRESSION --------------.
+      if ("log" %in% what) {
+        # Do regression
+        res.logreg <- 
+          pv.rrepest.logreg(data = df, svy = svy, x = rgr, y = tgt.i, by.var = by.var,
+                        over = over, test = test, user_na = user_na, flag = flag,
+                        fast = fast, pv = pv, ...)
+        
+        # Append result of regression to list of results
+        res.tgt.i <- append(res.tgt.i, list(res.logreg))
+      }
+      #---------------------------------------.
+      #-------------- ODDS RATIO DELTA METHOD Part 1: Names --------------.
+      if ("odr" %in% what) {
+        # Do regression
+        res.odr <- 
+          pv.rrepest.odr(data = df, svy = svy, x = rgr, y = tgt.i, by.var = by.var,
+                            over = over, test = test, user_na = user_na, flag = flag,
+                            fast = fast, pv = pv, ...)
+        
+        # Append result of regression to list of results
+        res.tgt.i <- append(res.tgt.i, list(res.odr))
       }
       #---------------------------------------.
       
@@ -262,17 +301,53 @@ rrepest_base <- function(data, svy, est, by = NULL, over = NULL,
   # Stop the cluster if pvs
   if(pv) stopCluster(cl)
   
+  ###if PIAAC, modify pv.l to account for by.var specific variance factors:
+  
+  if (svy=="PIAAC") {  
+    pv.l<- add_PIAAC_variance_factors(pv.l=pv.l, pv=pv, df=df,by.var=by.var)
+  }
   
   
   # If there are no PVs return first element of the list
   if (!pv) {
     result <- pv.l[[1]] %>% as_tibble()
   } else {
+    
     # Check which inputs have an @
     pv.inputs <- c(tgt,rgr,by.var,over)[grepl("@", c(tgt,rgr,by.var,over))]
+    
+    
+    #modify the names and make sure that the pv appears, along with the name of the pv vars in case there is a over variable.
+    pv.inputs.collapsed<-  paste0(pv.inputs,collapse="") 
+    
+    for(pv.i in digits.pvs(svy = svy,...)) {
+      pv.i.inputs_collapsed<-  pv.inputs.collapsed %>%  gsub(x = .,pattern="@",replacement=pv.i)
+      names(pv.l[[pv.i]]) <- c(names(pv.l[[pv.i]])[1:length(by.var)],
+                               paste0(
+                                 names(pv.l[[pv.i]])[-c(1:length(by.var))],
+                                 pv.i.inputs_collapsed))
+    }
+    
+    
     # If there are PVs Calculate B and Imputation and Sampling Variance for SE
-    result <- b.se.pv(res.l = pv.l, pv.inputs = pv.inputs, statistic = what) %>% as_tibble()
+    result <- b.se.pv(res.l = pv.l, pv.inputs = pv.inputs, statistic = what) %>% 
+      as_tibble() %>%   setNames(nm = str_remove(names(.),paste0(pv.inputs.collapsed,"$")))
+    
   }
+  
+  #-------------- LOGISTIC REGRESSION DELTA METHOD Part 2: Estimates --------------.
+  if("odr" %in% what){
+    # Grab b. columns and strip the of the b.
+    result_names <- names(result)
+    estimate_names <- substring(result_names[grep("^b\\.",result_names)], first = 3)
+    
+    # Loop over estimate names and do for β: exp(b.odr), for SE: exp(b.odr) * se.odr
+    for (est_i in estimate_names){
+      result[[paste0("se.",est_i)]] <- exp(result[[paste0("b.",est_i)]]) * result[[paste0("se.",est_i)]]
+      result[[paste0("b.",est_i)]] <- exp(result[[paste0("b.",est_i)]])
+    }
+  }
+  #----------------------------.
   
   return(result)
 }

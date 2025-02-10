@@ -17,3 +17,6 @@ Dataframe cointaining inverted test column names for "b." and "se." according to
 \description{
 Invert test column from Rrepest test = TRUE by name on "b." and "se." in the column name and by sign (*-1) on "b."
 }
+\examples{
+inv_test(rrepest_pisa_age_gender, name_index = 6) 
+}

@@ -2,27 +2,27 @@
 % Please edit documentation in R/weighted_correlation.R
 \name{weighted.corr}
 \alias{weighted.corr}
-\title{Weighted Bivariate Correlation}
+\title{Weighted bivariate correlation}
 \usage{
 weighted.corr(x, y, w, na.rm = TRUE)
 }
 \arguments{
-\item{x}{(numeric vector) variable from where to get correlation}
+\item{x}{(numeric vector) Variable of interest x for computing the correlation}
 
-\item{y}{(numeric vector) variable from where to get correlation}
+\item{y}{(numeric vector) Variable of interest y for computing the correlation}
 
-\item{w}{(numeric vector) vector of weights}
+\item{w}{(numeric vector) Vector with the weights}
 
-\item{na.rm}{(bool) True: NAs be stripped before computation proceeds}
+\item{na.rm}{(bool) if TRUE: Excludes missing values before computing the correlation}
 }
 \value{
-Pearson correlation coefficient
+Scalar containing the Pearson correlation coefficient
 }
 \description{
-Compute weighted pearson correlation coefficient of two numeric vectors
+Computes the weighted Pearson correlation coefficient of two numeric vectors.
 }
 \examples{
 data(df_talis18) 
 
-weighted.corr(x = df_talis18$T3STAKE, y = df_talis18$T3TEAM, w = df_talis18$TCHWGT)
+weighted.corr(x = df_talis18$t3stake, y = df_talis18$t3team, w = df_talis18$tchwgt)
 }

@@ -2,23 +2,26 @@
 % Please edit documentation in R/pv_rrepest_groups_argument.R
 \name{grp}
 \alias{grp}
-\title{grp}
+\title{Group list}
 \usage{
-grp(group.name, column, cases)
+grp(group.name, column, cases, full_weight = FALSE)
 }
 \arguments{
 \item{group.name}{(string) Name of the group to be displayed}
 
-\item{column}{(string) Column where the data is located}
+\item{column}{(string) Column/variable of interest to be grouped}
 
-\item{cases}{(string vector) List of values to be put into the group}
+\item{cases}{(string vector) Rows/values to be included in the group}
+
+\item{full_weight}{(bool) TRUE: average of the group will be weighted average}
 }
 \value{
-list of groups to redefine group_name = column, values_in_group
+List containing the arguments for the grp() function used within Rrepest() function's average() and group() options.
 }
 \description{
-Obtain a list as argument for groups to be evaluated in data
+Obtains a list with the arguments for the grp() function used within Rrepest() function's average() and group() options.
 }
 \examples{
 append(grp("OECD Average","CNTRY",c("HUN","MEX")), grp("Europe","CNTRY",c("ITA","FRA")))
+
 }

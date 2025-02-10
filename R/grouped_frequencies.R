@@ -1,11 +1,12 @@
-#' Grouped Frequencies
-#' @description Compute a DataFrame with frequency counts obtained from the sum of 'small.level' and 'big.level' after grouping, which can be used to calculate percentages.
-#' @param data (dataframe) Data to analize
+#' Grouped frequency counts
+#' 
+#' @description Computes a data frame with frequency counts.
+#' @param data (data frame) Data to analyse
 #' @param small.level (string vector) All variables to get grouped sum that will sum up to 100
-#' @param big.level (string vector) Must be fully contained in variables from small.level
-#' @param w (string) Numeric variable from which to get weights (optional)
+#' @param big.level (string vector) Variables... Must be fully contained in variables from small.level.
+#' @param w (string) Name of the numeric variable representing the weights (optional)
 #'
-#' @return Dataframe with frequencies from the grouped sum of small.level and big.level used for getting percentages
+#' @return Data frame containing the frequency counts
 #' @export
 #'
 #' @examples grouped_sum_freqs(data = mtcars,small.level = c("cyl","am"),big.level = c("cyl"))

@@ -7,19 +7,22 @@
 est(statistic, target, regressor = NULL)
 }
 \arguments{
-\item{statistic}{(string vector) accepts "mean","var","std", "quant", "iqr", "freq", "lm", "corr", "cov"}
+\item{statistic}{(string vector) Statistics of interest that can include
+mean ("mean"), variance ("var"), standard deviation ("std"), quantile ("quant"), inter-quantile range ("iqr"),
+frequency count ("freq"), correlation ("corr"), linear regression ("lm"), covariance ("cov") and
+any other statistics that are not pre-programmed into Rrepest but take a data frame and weights as parameters ("gen")}
 
-\item{target}{(string vector) variable from where to get estimation}
+\item{target}{(string vector) Variable(s) of interest of the estimation}
 
-\item{regressor}{(string vector) independent variable for regression (1+)}
+\item{regressor}{(string vector) Independent variable(s) to be included in a linear regression}
 }
 \value{
-list of components to estimate for repest
+List containing the arguments for the est() function used within Rrepest() function
 }
 \description{
-Input the statistic wanted, target variable, and (optional) list of regressors
+Obtains a list with the arguments for the est() function used within the Rrepest() function.
 }
 \examples{
-est(c("mean","quant",.5,"corr"),c("pv1math","pv1read","Pv1SCIE"))
+est(c("mean","quant",.5,"corr"),c("pv1math","pv1read","pv1scie"))
 
 }

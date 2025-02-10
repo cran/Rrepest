@@ -1,11 +1,11 @@
 #' Weighted variance
 #' 
-#' @description Calculate the weighted variance numeric vector
-#' @param x (numeric vector) variable to analyze
-#' @param w (numeric vector) vector of weights
-#' @param na.rm (bool) if TRUE remove missing values.
+#' @description Computes the weighted variance of a numeric vector.
+#' @param x (numeric vector) Variable of interest for which to compute the variance
+#' @param w (numeric vector) Vector with weights
+#' @param na.rm (bool) if TRUE: Excludes missing values before computing the variance
 #'
-#' @return Scalar with Variance or Standard Deviation
+#' @return Scalar containing the variance
 #' @export
 #'
 #' @examples
