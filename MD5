@@ -1,9 +1,10 @@
-3b721039a08540cf56f5b331daddd571 *DESCRIPTION
+b38c1c6be4f04027216a12f20b761072 *DESCRIPTION
 8fd23aeadf39b2bf69dfca9aa3a70c06 *LICENSE
-7c946fea3c8950e017901d998ef9dd9f *NAMESPACE
+744b147acb934b36c0810d78f43a6ae8 *NAMESPACE
 8a863873f57d628195cb46b0ab7c4359 *R/Mode.R
-1c47986134ff851edd2b172c59a88358 *R/average.R
-f85255713ff59b31060f7df9a415b09e *R/coverage_column.R
+2583a9a92e7089f8cb2d4066b74aa0bb *R/average.R
+178d3e7cc87020b2bb390b27507ae82f *R/coverage_column.R
+c979eff81940586f5914cac703192ac8 *R/coverage_daggers.R
 b3878f1c50acfc1c93cc715e32a19cb6 *R/coverage_pct.R
 86489b7f111122d5e58d7ce15dcde3fe *R/data.R
 d6a534fe470fce1a4fcb9bbc103d228d *R/flags.R
@@ -45,6 +46,7 @@ dfed23325c3d8799bdc49019542fe014 *data/rrepest_pisa_age_gender.rda
 9b155984580e347ad25238ace5d438b1 *data/rrepest_pisa_age_isced.rda
 8186bf04a60b95dcf4cc86d510cb3efd *man/Rrepest.Rd
 bd133f5083bb96d4c0612c4de46d5677 *man/average_groups.Rd
+07898f229ac7867b57b26c2c49b440eb *man/coverage_daggers.Rd
 7b46075fc11dec86d6359532703341b5 *man/coverage_pct.Rd
 646ce420c33db76ea5c2f776c55eac52 *man/df_pisa18.Rd
 568a58b172b43f8a0785d240e9302fcd *man/df_talis18.Rd

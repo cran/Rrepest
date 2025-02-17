@@ -47,10 +47,9 @@ coverage_column <- function(data, res, by = NULL, over = NULL, est, svy, user_na
   if(is.null(by)) by <- "."
 
   # Get coverage vector
-  if (any(what %in% "freq")){
-    # For freq coverage is always 100%
-    message("The coverage column/condition is not shown as it is 100% for all columns when calculating frequencies.")
-  } else {
+  # if (any(what %in% "freq")){
+  #   tgt_coverage <- tgt
+  # } else {
     # If lm, log or odds the coverage is from the regressors
     if(any(what %in% c("lm","log","odr"))){
       tgt_coverage <- rgr
@@ -91,14 +90,31 @@ coverage_column <- function(data, res, by = NULL, over = NULL, est, svy, user_na
       tgt_coverage <- c(tgt_coverage, "rsqr") # Must be lowercase for the search
       res_cvg_l[["rsqr"]] <- res_cvg %>% select(!starts_with("cvge"),"cvge.rsqr")
     } 
+  # } OLD: Frequencies not included in coverage
+  
+  # Check if names are similar for FREQUENCIES and add them to the res_cvg data
+  if(any(what %in% c("freq"))){
+    # Get the names of se after first dot
+    names0res <- names(res)[grep("^se\\.",names(res))] %>% substring(4)
+    # Get the names of cvge after first dot
+    names0res_cvge <- names(res_cvg)[grep("^cvge\\.",names(res_cvg))] %>% substring(6)
+    
+    for(n_cvge_i in names0res_cvge){
+      for(n_i in names0res){
+        # Split both names and subtract 2nd component from n_i
+        n_cvge_i_check <- paste(strsplit(n_cvge_i,"\\.{1,2}")[[1]],collapse = "..")
+        n_i_check <- paste(strsplit(n_i,"\\.{1,2}")[[1]][-2],collapse = "..")
+        if(n_cvge_i_check == n_i_check){
+          # the name of 
+          res_cvg[[paste0("cvge.",n_i)]] <- res_cvg[[paste0("cvge.",n_cvge_i)]]
+        }
+      }
+    }
   }
-  
-  
-  
   
   # We have the dataframe from where to start extracting coverage
   # !!!!!IMPORTANT!!!!!: Coverage must be done in Rrepest separately for either statistics, or frequencies, or corr/cov, or lm
-  if(!any(what %in% c("freq","gen"))){
+  if(!any(what %in% c("gen"))){
 
 
     # -------------------------------------------------------------------------
@@ -110,8 +126,9 @@ coverage_column <- function(data, res, by = NULL, over = NULL, est, svy, user_na
 
         #Go over all names of the res df and if it finds se..
         if (startsWith(x,"se")){
-          #Get the 3rd component in the column name (after the dots. and before the two dots..)
-          x_tgt <- strsplit(x,split = "\\.{1,2}")[[1]][3]
+          #Get the 3rd component in the column name (after the dots. and before the two dots..), the second if frequencies
+          nth_component <- ifelse(any(what %in% c("freq")), 2 , 3)
+          x_tgt <- strsplit(x,split = "\\.{1,2}")[[1]][nth_component]
           
           #Check which target variables are in this name component
           tgts_in_column <- tolower(tgt_coverage)[sapply(tolower(tgt_coverage), grepl,x_tgt, USE.NAMES = FALSE)]
@@ -160,8 +177,11 @@ coverage_column <- function(data, res, by = NULL, over = NULL, est, svy, user_na
     for (i in names(res)) {
       if (!is.null(new_columns[[i]])){
         
+        
+        # Removing 1st and 2nd component in all cases and 1st only for frequencies
+        name_components2remove <- if(any(what %in% c("freq"))) 1 else c(1,2)
         # Get the ending of the column
-        ending <- paste(strsplit(i,".",fixed = T)[[1]][-c(1,2)],collapse = ".")
+        ending <- paste(strsplit(i,".",fixed = T)[[1]][-name_components2remove],collapse = ".")
         
         # if there are 2+ cvge columns to choose from
         if(length(new_columns[[i]]) > 1){

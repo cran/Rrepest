@@ -69,6 +69,13 @@ average_groups <- function(res, data = NULL, group, by = NULL, over = NULL, est 
         group_by(across(all_of(by))) %>% 
         summarise(across(starts_with("b."),\(x) mean(x, na.rm = TRUE)))
       
+      # Average for cvge (if exists) -----------------------------------------------------------
+      res.cvge <- res.df %>% 
+        #get by and b.
+        select(by, starts_with("cvge.")) %>% 
+        group_by(across(all_of(by))) %>% 
+        summarise(across(starts_with("cvge."),\(x) mean(x, na.rm = TRUE)))
+      
       # calculate √(Σ(se))/n for se. --------------------------------------------
       res.se <- res.df %>%
         select(by,starts_with("se.")) %>% 
@@ -136,6 +143,13 @@ average_groups <- function(res, data = NULL, group, by = NULL, over = NULL, est 
         group_by(across(all_of(by))) %>% 
         summarise(across(starts_with("b."),\(x) weighted.mean(x = x, w = .data$weights, na.rm = TRUE)))
       
+      # Average for WEIGHTED cvge -----------------------------------------------------------
+      res.cvge <- res.df %>% 
+        #get by and b.
+        select(by, starts_with("cvge."), "weights") %>% 
+        group_by(across(all_of(by))) %>% 
+        summarise(across(starts_with("cvge."),\(x) weighted.mean(x = x, w = .data$weights, na.rm = TRUE)))
+      
       # calculate √(Σ(N^2 * se^2))/ ΣN. --------------------------------------------
       res.se <- res.df %>%
         select(by,starts_with("se."), "weights") %>% 
@@ -145,11 +159,15 @@ average_groups <- function(res, data = NULL, group, by = NULL, over = NULL, est 
       
     }
     
-    
     # Join b. and se. together
-    res.df <- inner_join(x = res.b, y = res.se, by = by) %>% 
+    res.df <- inner_join(x = res.b, y = res.se, by = by) 
+    
+    # If there are cvge columns in the names of res merge them to the res.df
+    if(any(grepl("^cvge\\.",names(res)))){
+      res.df <- left_join(x = res.df, y = res.cvge, by = by) 
+    }
       #reorder according to original database
-      select(names(res))
+    res.df <- res.df %>% select(names(res))
 
     
     
