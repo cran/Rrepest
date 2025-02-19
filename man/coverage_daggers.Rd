@@ -23,7 +23,5 @@ If coverage is above both levels, no symbol is produced (empty). Used with the c
 option in Rrepest set to TRUE to produce columns with coverage percentages.
 }
 \examples{
-cvge_data <- Rrepest(df_talis18, est = est("freq", "tt3g23o"), 
-svy = "TALISTCH", by = "cntry", coverage = TRUE)
-coverage_daggers(cvge_data, one_dagger = 95, two_dagger = 90)
+coverage_daggers(talis18_tt3g23o_freq, one_dagger = 95, two_dagger = 90)
 }

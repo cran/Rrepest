@@ -14,9 +14,7 @@
 #' @export
 #'
 #' @examples
-#' cvge_data <- Rrepest(df_talis18, est = est("freq", "tt3g23o"), 
-#' svy = "TALISTCH", by = "cntry", coverage = TRUE)
-#' coverage_daggers(cvge_data, one_dagger = 95, two_dagger = 90)
+#' coverage_daggers(talis18_tt3g23o_freq, one_dagger = 95, two_dagger = 90)
 
 coverage_daggers <- function(res_df, one_dagger = 75, two_dagger = 50){
   # GOAL: Assign dagger and double dagger to coverage column for determined thresholds

@@ -605,3 +605,22 @@ nans_from_se2b <- function(df){
   return(df)
 }
 
+n_obs_sch_freq_fix <- function(n_df, by.var, over, x){
+  # Goal: Adjust n for observations ans school for frequencies to use in flags.
+  # The rule followed by PISA for flagging simple breakdowns/frequencies is to apply the flag at the QUESTION level.
+  # ------ INPUTS ------.
+  # n_df : (dataframe) Data with n of observations and schools
+  # by.var : (string) column in which we'll break down results !IOP!: several variables
+  # x : (string) variable from where to get statistics
+  # over : (vector string) columns over which to do analysis
+  n_df %>% 
+    # Separete x from all else
+    separate(col = by.group,into = c(by.var, over, x), sep = "\\|") %>%
+    unite(col= "by.var.nox",c(by.var, over),sep = "|") %>% 
+    # Sum by breakdown excluding x
+    group_by(.data$by.var.nox) %>% 
+    mutate(across(where(is.numeric), ~ sum(.,na.rm = TRUE))) %>% 
+    ungroup() %>% 
+    # Reunite into by.group
+    unite(col = "by.group",c("by.var.nox",x),sep = "|")
+}

@@ -214,6 +214,8 @@ pv.loop.freq.on.weights <- function(data, x, by.var, over, test = F, flag = F, s
   if (flag) {
     # Get n for flags and separate column
     n.df <- n.obs.x(df = data, by.var = c(by.var, over, x), x = x, svy = svy)
+    # Fix for frequencies
+    n.df <- n_obs_sch_freq_fix(n_df = n.df, by.var = by.var, over = over, x = x)
     
     res.l <- lapply(res.l, function(res.i){
       # Merge both dfs together n and freqs

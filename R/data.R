@@ -76,3 +76,22 @@
 #' }
 #' @source <https://www.oecd.org/en/data/datasets/pisa-2018-database.html#data>
 "df_pisa18"
+
+#' Rrepest table of results for TALIS 2018 showing a frequency for other areas of professional development
+#' 
+#' A table of results from Rrepest for professional development broken down by 
+#' completed schooling level of students' mothers for the Teaching and 
+#' Learning International Survey (TALIS) 2018 cycle
+#' @format ## `talis18_tt3g23o_freq`
+#' A data frame in tibble format with 3 rows and 7 columns: 
+#' \describe{
+#'   \item{cntry}{Country ISO 3166-1 alpha-3 codes.}
+#'   \item{b.tt3g23o.No}{Percentage of teachers with No other areas of professional development}
+#'   \item{se.tt3g23o.No}{Standard error of th percentage of teachers with No other areas of professional development}
+#'   \item{cvge.tt3g23o.No}{Coverage of the percentage of teachers with No other areas of professional development}
+#'   \item{b.tt3g23o.Yes}{Percentage of teachers with other areas of professional development}
+#'   \item{se.tt3g23o.Yes}{Standard error of th percentage of teachers with other areas of professional development}
+#'   \item{cvge.tt3g23o.Yes}{Coverage of the percentage of teachers with other areas of professional development}
+#' }
+#' @source <https://www.oecd.org/en/data/datasets/talis-2018-database.html#data>
+"talis18_tt3g23o_freq"
