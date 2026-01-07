@@ -22,6 +22,7 @@ Rrepest(
   invert_tests = FALSE,
   save_arg = FALSE,
   cores = NULL,
+  se_zero2na = FALSE,
   ...
 )
 }
@@ -66,6 +67,8 @@ It has three arguments: name of the group, column/variable used for computing th
 \item{save_arg}{(bool) TRUE: returns a named list with the estimation data frame and all arguments used in Rrepest.}
 
 \item{cores}{(numeric) NULL: Will recruit max-1 cores when doing PVs. Else, will recruit the specified number of cores for PVs}
+
+\item{se_zero2na}{(bool) TRUE: Masks SE of 0 as NA from a mean, meanpct, or freq with 1, 100, or 0}
 
 \item{...}{Other optional parameters include:
 isced = Filters the data used for analysis by ISCED level (e.g. isced = 2),

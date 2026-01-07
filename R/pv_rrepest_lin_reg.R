@@ -25,7 +25,7 @@ format_data_cont_vars <- function(df, cont.vars) {
   
   return(df.res)
 }
-pv.do.lm <- function(df, x, y, by.var, w, ...){
+pv.do.lm <- function(df, x, y, by.var, w){
   # Goal: Get coefficients and r2 from linear regression
   # ------ INPUTS ------.
   # df : (dataframe) df to analyze previosly formated
@@ -79,7 +79,7 @@ pv.do.lm <- function(df, x, y, by.var, w, ...){
   
   return(res.df)
 }
-pv.do.lm.PAR <- function(df, x, y, by.var, w, ...){
+pv.do.lm.PAR <- function(df, x, y, by.var, w, weighted.var){
   # Goal: Get coefficients and r2 from linear regression
   # ------ INPUTS ------.
   # df : (dataframe) df to analyze previosly formated
@@ -91,7 +91,7 @@ pv.do.lm.PAR <- function(df, x, y, by.var, w, ...){
   #(functions) weighted.var
   
   # get ... arguments
-  arg <- list(...)
+  # arg <- list(...)
   
   
   if (is.data.table(df)) {
@@ -121,8 +121,8 @@ pv.do.lm.PAR <- function(df, x, y, by.var, w, ...){
       Y <- .[y] %>% as.matrix()
       W <- .[w] %>% as.matrix() %>% as.vector()
       
-      ssr <- arg$weighted.var(Y-resid(model),W)
-      sst <- arg$weighted.var(Y,W)
+      ssr <- weighted.var(Y-resid(model),W)
+      sst <- weighted.var(Y,W)
       r2 <- ssr/sst
       
       model %>% 
@@ -171,15 +171,14 @@ pv.loop.lm.on.weights <- function (data, x, y, by.var, over, test = F, flag = F,
     res.l <- foreach(w.i = rep_weights,
                      .packages = c("dplyr","tidyr","data.table","tibble"),
                      .export = c("pv.do.lm.PAR","n.obs.x",
-                                 "weighted.var","...")) %dopar% {
+                                 "weighted.var")) %dopar% {
                                    
                                    res.df <- pv.do.lm.PAR(data.par,
                                                           x,
                                                           y,
                                                           all_of(c(by.var,over)),
                                                           w.i,
-                                                          weighted.var = weighted.var,
-                                                          ...=...) %>% 
+                                                          weighted.var = weighted.var) %>% 
                                      unite("by.var", all_of(c(by.var,over)), sep = "|")
                                    return(res.df)
                                  }

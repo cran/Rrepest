@@ -20,7 +20,7 @@ rrvar.pv <- function(df.rr, svy, pv = F, ...) {
   arguments <- list(...)
   
   # f : (number) variance factor (depends on replication method: BRR, jackknife-1, jk-2,…) (Fay = 1.5)
-  if (svy %in% c("TALISTCH","TALISSCH","PISA","PISA2015","PBTS")) f = 1/(0.5^2)
+  if (svy %in% c("TALISTCH","TALISSCH","PISA","PISA2015","PBTS","TALISTKS")) f = 1/(0.5^2)
   else if (svy == "SSES") f = 76/2
   else if (svy == "SSES2023") f = 1/(0.5^2) #Changed from Jk1 method to BBR method 
   else if (svy %in% c("ALL","IALS")) f = 30
@@ -73,7 +73,7 @@ n.obs.x <- function(df, by.var, x, svy) {
   tot.n <- df %>%
     group_by(across(all_of(by.var))) %>%
     {if (svy == "TALISSCH") summarise(., n.obs = sum(!is.na(get(x)))) 
-      else if (svy == "TALISTCH") {mutate(.,school.n = ifelse(is.na(get(x)) == T, NA, .data$idschool)) %>% 
+      else if (svy %in% c("TALISTCH","TALISTKS")) {mutate(.,school.n = ifelse(is.na(get(x)) == T, NA, .data$idschool)) %>% 
           summarise(., n.obs = sum(!is.na(get(x))),
                     n.sch = n_distinct(school.n, na.rm = T))}
       else if (svy == "TALISEC_STAFF") {mutate(.,school.n = ifelse(is.na(get(x)) == T, NA, .data$idcentre)) %>% 
@@ -140,7 +140,7 @@ format_data_repest <- function(df, svy, x, by.over, user_na = F, ...) {
   }
   
   # Weight names depending on project (TALIS, PISA, etc.)
-  if (svy == "TALISTCH") weight.variables <- c("tchwgt",paste0("trwgt",1:100))
+  if (svy %in% c("TALISTCH","TALISTKS")) weight.variables <- c("tchwgt",paste0("trwgt",1:100))
   else if (svy == "TALISSCH") weight.variables <- c("schwgt",paste0("srwgt",1:100))
   else if (svy %in% c("PISA","PISA2015")) weight.variables <- c("w_fstuwt",paste0("w_fsturwt",1:80))
   else if (svy == "SSES") weight.variables <- c("wt2019",paste0("rwgt",1:76))
@@ -268,7 +268,7 @@ replicated_w_names <- function(svy, ...) {
   arguments <- list(...)
   
   # Weight names depending on project (TALIS, PISA, etc.)
-  if (svy == "TALISTCH") weight.variables <- c("tchwgt",paste0("trwgt",1:100))
+  if (svy %in% c("TALISTCH","TALISTKS")) weight.variables <- c("tchwgt",paste0("trwgt",1:100))
   else if (svy == "TALISSCH") weight.variables <- c("schwgt",paste0("srwgt",1:100))
   else if (svy %in% c("PISA","PISA2015")) weight.variables <- c("w_fstuwt",paste0("w_fsturwt",1:80))
   else if (svy == "PISAOOS") weight.variables <- c("spfwt0",paste0("spfwt",1:30))
@@ -373,7 +373,7 @@ digits.pvs <- function(svy, ...) {
   
   # Number of plausible values (TALIS, PISA, etc.)
   if (svy %in% c("PISA2015","PISAOOS","PIAAC","ALL","IALS")) n.d.pvs <- 1:10
-  else if (svy %in% c("PISA","IELS","PBTS","ICCS",
+  else if (svy %in% c("PISA","IELS","PBTS","ICCS", "TALISTKS",
                       "ICILS","ICCS_T","ICILS_T",
                       "ICCS_C","ICILS_C","TIMSS","PIRLS")) n.d.pvs <- 1:5
   
@@ -623,4 +623,27 @@ n_obs_sch_freq_fix <- function(n_df, by.var, over, x){
     ungroup() %>% 
     # Reunite into by.group
     unite(col = "by.group",c("by.var.nox",x),sep = "|")
+}
+
+se_to_na <- function(res_df, mean_stat = FALSE){
+  # GOAL: Turn se with 0 to NA from a mean, meanpct, or freq with 1, 100, or 0 
+  # ------ INPUTS ------.
+  # res_df: (dataframe) Results from Rrepest with b. and se. columns
+  # mean_stat: (bool) TRUE mean used in statistics, add it to the columns to search for
+  
+  # if mean used in statistics add it to the columns to search for
+  if(mean_stat) mean_string <- "mean" else mean_string <- ""
+  # Iterate through all names and find b.
+  for(col_i in names(res_df)){
+    if(grepl(paste0("^b\\.",mean_string), col_i)){
+      # Replace in corresponding se. the 0 with an NA if value for b. is 0. 1 or 100 (only mean and frequency)
+      se_i <- paste0("se.",substring(col_i,3), collapse = "")
+      # Which are 0 se. and 1, 100, or 0 b.
+      se_to_remove <- intersect(which(res_df[[col_i]] %in% c(0,100)), # b. is 0, 1 or 100
+                                which(res_df[[se_i]] %in% c(0))) # se. the 0 
+      # Set those as NaN
+      res_df[[se_i]][se_to_remove] <- NaN
+    }
+  }
+  return(res_df)
 }

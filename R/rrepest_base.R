@@ -66,8 +66,18 @@ rrepest_base <- function(data, svy, est, by = NULL, over = NULL,
   
   # TEST: Remove NAs from last variable in over, to avoid yy..(xx-NA) --------.
   if (test){
-    data <- data %>% 
-      drop_na(all_of(over[length(over)])) 
+    # If @ in over variable remove all NAs from all pv variables
+    if(grepl(pattern = "@", x = over[length(over)])){
+      last_pv_over <- sapply(pv.digits, function(pv_i){
+        sub(pattern = "@", replacement = pv_i, x = over[length(over)])
+      })
+      # Remove all NA values from that over
+      data <- data %>% 
+        drop_na(all_of(last_pv_over))
+    } else {
+      data <- data %>% 
+        drop_na(all_of(over[length(over)])) 
+    }
   }
   
   
@@ -138,7 +148,13 @@ rrepest_base <- function(data, svy, est, by = NULL, over = NULL,
     
     # Select necessary data and convert to to datable
     # GENERAL option: Assumes only essential data is preselected by user
-    if (!("gen" %in% what)) {data.par <- as.data.table(df[,get.pv.arguments(pv.digits,c(tgt,rgr,rep_weights,by.var,over))])}
+    if (!("gen" %in% what)) {
+      # Quantile table may include a what of the form "pv@math__pv@read" which needs to be dived into "pv@math" & "pv@read"
+      data.par <- as.data.table(
+        df[,get.pv.arguments(pv.digits,
+                             c(unlist(strsplit(tgt,"__")), # Will assume "__" is a way to split the target tgt
+                               rgr,rep_weights,by.var,over) 
+        )])}
     else {data.par <- as.data.table(data)}
     
     # Set up cluster working nodes and what they have to know
@@ -153,7 +169,7 @@ rrepest_base <- function(data, svy, est, by = NULL, over = NULL,
     clusterExport(cl, "data.par",envir = environment())
     doParallel::registerDoParallel(cl)
   }
-  
+   
   # PLAUSIBLE VALUES LOOP -------------------------------------------------
   pv.l <- lapply(pv.digits, function(pv.d.i) {
     if (pv) message(as.character(pv.d.i)) #counter of pvs
@@ -171,8 +187,9 @@ rrepest_base <- function(data, svy, est, by = NULL, over = NULL,
       #-------------- STATISTICS --------------.
       # If there is something else than freq
       if(any(c("mean","means","meanpct","meanspct","var","std", "sd", "quant", "iqr") %in% what )){
-        # remove "log","lm" and "freq"
-        what.statistic <- what[! what %in% c("lm","log","freq","corr","cov")]
+        # remove "log","lm" and "freq", "quintiletable"
+        what.statistic <- what[-c(which(what == "quintiletable"), which(what == "quintiletable") + 1)]
+        what.statistic <- what[! what %in% c("lm","log","freq","corr","cov","quintiletable")]
         
         # if flag show.n as "flag"
         if (flag) {show.n = "flag"} else {show.n = "n"}
@@ -245,6 +262,34 @@ rrepest_base <- function(data, svy, est, by = NULL, over = NULL,
         
         # Append result of regression to list of results
         res.tgt.i <- append(res.tgt.i, list(res.odr))
+      }
+      #---------------------------------------.
+      #-------------- QUINTILE TABLE --------------.
+      if ("quantiletable" %in% what) {
+        # Get number of quantiles and if decimal the difference from last to first
+        quant_n <- what[grep(pattern = "quantiletable",x = what)+1] %>% as.numeric()
+        
+        # Create variable for flags and coverage "var1__var2"
+        if(grepl("__",tgt)){
+          # If found separete element into "y for order" and "y for mean""
+          y_vars <- strsplit(tgt,"__")[[1]]
+          y_4order <- y_vars[1]
+          y_4mean <- y_vars[2]
+          # Get the name of y for columns
+          y_name <- paste0(y_4order,"__",y_4mean)
+          tgt.i <- y_name
+          # y_name will be multiplication of both to get the proper ammount of NAs
+          df[[y_name]] <- df[[y_4order]] * df[[y_4mean]]
+        }
+        
+        # Do quantile table
+        res.qtable <- 
+          pv.rrepest.quantiletable(data = df, svy = svy, quant_n = quant_n, y = tgt.i, by.var = by.var,
+                         over = over, test = test, user_na = user_na, flag = flag,
+                         fast = fast, pv = pv, ...)
+        
+        # Append result of regression to list of results
+        res.tgt.i <- append(res.tgt.i, list(res.qtable))
       }
       #---------------------------------------.
       

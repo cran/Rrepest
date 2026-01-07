@@ -5,7 +5,7 @@
 # Goal: Obtain coefficients from logistic regression model in the form of Odds Ratio with greater speed
 
 
-pv.do.odr <- function(df, x, y, by.var, w, ...){
+pv.do.odr <- function(df, x, y, by.var, w){
   # Goal: Get coefficients from logistic regression odds ratio
   # ------ INPUTS ------.
   # df : (dataframe) df to analyze previosly formated
@@ -56,7 +56,7 @@ pv.do.odr <- function(df, x, y, by.var, w, ...){
   
   return(res.df)
 }
-pv.do.odr.PAR <- function(df, x, y, by.var, w, ...){
+pv.do.odr.PAR <- function(df, x, y, by.var, w, weighted.var){
   # Goal: Get coefficients from logistic regression Odds Ratio
   # ------ INPUTS ------.
   # df : (dataframe) df to analyze previosly formated
@@ -68,7 +68,7 @@ pv.do.odr.PAR <- function(df, x, y, by.var, w, ...){
   #(functions) weighted.var
   
   # get ... arguments
-  arg <- list(...)
+  # arg <- list(...)
   
   
   if (is.data.table(df)) {
@@ -145,15 +145,14 @@ pv.loop.odr.on.weights <- function (data, x, y, by.var, over, test = F, flag = F
     res.l <- foreach(w.i = rep_weights,
                      .packages = c("dplyr","tidyr","data.table","tibble"),
                      .export = c("pv.do.odr.PAR","n.obs.x",
-                                 "weighted.var","...")) %dopar% {
+                                 "weighted.var")) %dopar% {
                                    
                                    res.df <- pv.do.odr.PAR(data.par,
                                                               x,
                                                               y,
                                                               all_of(c(by.var,over)),
                                                               w.i,
-                                                              weighted.var = weighted.var,
-                                                              ...=...) %>% 
+                                                              weighted.var = weighted.var) %>% 
                                      unite("by.var", all_of(c(by.var,over)), sep = "|")
                                    return(res.df)
                                  }

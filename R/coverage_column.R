@@ -56,6 +56,24 @@ coverage_column <- function(data, res, by = NULL, over = NULL, est, svy, user_na
     } else {
       tgt_coverage <- tgt
     }
+  
+    # If any element has @ in it replace it with a 1 in df_covg, PVs must have the same valid values = Coverage done on the 1st PV
+    if(any(grepl(pattern = "@", x = tgt_coverage))){
+      for(tgt_i in tgt_coverage){
+        # Look for the 1st pv and replace the 1 with an @
+        tgt2find <- sub(pattern = "@", replacement = "1",tgt_i)
+        names(df_covg)[which(names(df_covg) == tgt2find)] <- tgt_i
+      }
+    }
+    # Likewise on the over, do it on the 1st pv
+    if(any(grepl(pattern = "@", x = over))){
+      for(over_i in over){
+        # Look for the 1st pv and replace the 1 with an @
+        over2find <- sub(pattern = "@", replacement = "1",over_i)
+        names(df_covg)[which(names(df_covg) == over2find)] <- over_i
+      }
+    }
+  
     # If multiple  targets (correlation or covariance) we need all their coverage options
     res_cvg_l <- lapply(tgt_coverage, function(tgt_x){
       coverage_pct(df = df_covg, by = c(by, over) ,x = tgt_x, w = replicated_w_names(svy = svy, ...)[1]) %>% 
@@ -185,12 +203,15 @@ coverage_column <- function(data, res, by = NULL, over = NULL, est, svy, user_na
         
         # if there are 2+ cvge columns to choose from
         if(length(new_columns[[i]]) > 1){
-          res_cvg <- res_cvg %>% 
-            rowwise() %>%  
-            mutate(Min = min(c_across(c(new_columns[[i]]))))
-          
-          #Rename Min column to cvg
-          names(res_cvg)[names(res_cvg) == 'Min'] <- paste0("cvge.",ending)
+          # If the name of the cvge column to calculculate is already in the res_cvg don't calculate it
+          if(! paste0("cvge.",ending) %in% names(res_cvg)){
+            res_cvg <- res_cvg %>% 
+              rowwise() %>%  
+              mutate(Min = min(c_across(c(new_columns[[i]]))))
+            
+            #Rename Min column to cvg
+            names(res_cvg)[names(res_cvg) == 'Min'] <- paste0("cvge.",ending)
+          }
         }
         
         

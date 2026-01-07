@@ -34,6 +34,7 @@
 #' @param total (grp function) Computes an average weighted by the estimated size of the target population covered.
 #' @param tabl (bool) if TRUE: Creates customisable and transferable tables using the flextable R package.
 #' @param coverage (bool/numeric) TRUE: shows column next to se. Numeric: Shows NaN if bellow the set coverage.
+#' @param se_zero2na (bool) TRUE: Masks SE of 0 as NA from a mean, meanpct, or freq with 1, 100, or 0 
 #' @param save_arg (bool) TRUE: returns a named list with the estimation data frame and all arguments used in Rrepest.
 #' @param cores (numeric) NULL: Will recruit max-1 cores when doing PVs. Else, will recruit the specified number of cores for PVs
 #' @param ... Other optional parameters include:
@@ -53,11 +54,12 @@
 #' @import flextable
 #' @import stringr
 #' @import officer
-#' @importFrom stats as.formula coefficients lm.wfit glm.fit na.omit qnorm resid weighted.mean setNames aggregate quasibinomial
+#' @importFrom stats as.formula coefficients lm.wfit glm.fit na.omit qnorm resid weighted.mean setNames aggregate quasibinomial runif
 #' @importFrom utils combn head
 #' @rawNamespace import(data.table, except = c(first,last,between,transpose))
 #' @rawNamespace import(purrr, except = c(when,compose,accumulate))
 #' @rawNamespace import(magrittr, except = c(set_names,extract))
+#' @rawNamespace import(rlang, except = c("flatten_lgl","splice","flatten_chr","flatten_raw","flatten","flatten_dbl","invoke","flatten_int",":=","%@%"))
 #' 
 #'
 #' @return Data frame containing estimation "b." and standard error "se.".
@@ -76,7 +78,7 @@
 Rrepest <- function(data, svy, est, by = NULL, over = NULL,
                     test = FALSE, user_na= FALSE, show_na = FALSE, flag = FALSE, fast = FALSE,
                     tabl = FALSE, average = NULL, total = NULL, coverage = FALSE, invert_tests = FALSE,
-                    save_arg = FALSE, cores = NULL,...) { #######group to total
+                    save_arg = FALSE, cores = NULL, se_zero2na = FALSE,...) { #######group to total
   # Goal: Dataframe with statistics for TALIS
   # ------ INPUTS ------.
   ######### WHO ######### 
@@ -103,6 +105,8 @@ Rrepest <- function(data, svy, est, by = NULL, over = NULL,
   # isced : (number) isced level to analyze
   # na_to_zero : (Bool) TRUE: will take NA as zero for the simple average calculation
   
+  # Turn data into tibble
+  data <- data %>% as_tibble()
   
   # Save all arguments to list
   if (save_arg){
@@ -118,7 +122,13 @@ Rrepest <- function(data, svy, est, by = NULL, over = NULL,
     }
   }
   
-  #Get na_to_zero from ...
+  # Patch for TALISSCH: At least 50 that start with srwgt (2018 at. av)
+  if(sum(grepl("^crwgt",names(data))) > 50){
+    names(data)[names(data) == "schwgtc"] <- "schwgt"
+    names(data)[names(data) %>% startsWith("crwgt")] <- paste0("s",substr(names(data)[names(data) %>% startsWith("crwgt")],2,10))
+  }
+  
+  # Get na_to_zero from ...
   arguments <- list(...)
 
   # Create a list of dfs for each concerning group
@@ -182,6 +192,22 @@ Rrepest <- function(data, svy, est, by = NULL, over = NULL,
     what <- est$what
     tgt <- est$tgt
     rgr <- est$rgr
+    
+    # Patch for quantile table
+    if ("quantiletable" %in% what) {
+      # Create variable for flags and coverage "var1__var2"
+      if(grepl("__",tgt)){
+        # If found separete element into "y for order" and "y for mean""
+        y_vars <- strsplit(tgt,"__")[[1]]
+        y_4order <- y_vars[1]
+        y_4mean <- y_vars[2]
+        # Get the name of y for columns
+        y_name <- paste0(y_4order,"__",y_4mean)
+        tgt.i <- y_name
+        # y_name will be multiplication of both to get the proper ammount of NAs
+        data[[y_name]] <- data[[y_4order]] * data[[y_4mean]]
+      }
+    }
     # Plausible Values DIGITS--------------------------------------------------
     # If tgt or rgr has an @ then get digits of PVs
     if (any(grepl("@", c(tgt,rgr,by,over)))) {
@@ -229,7 +255,16 @@ Rrepest <- function(data, svy, est, by = NULL, over = NULL,
       }
     }
   }
-  
+
+  # 0 SE for mean and freq --------------------------------------------------
+  # SE of 0 get marked as an NA if meanpct/freq is 0 or 100 but zero is still used for averages
+  if(se_zero2na){
+    if("freq" %in% est$what){
+      res.l <- se_to_na(res.l, mean_stat = FALSE)
+    } else if (any(c("mean","means","meanpct","meanspct") %in% est$what)){
+      res.l <- se_to_na(res.l, mean_stat = TRUE)
+    }
+  }
   
   #-------------- PRETTY TABLES --------------.
   if (tabl) {

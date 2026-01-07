@@ -5,7 +5,7 @@
 # Goal: Obtain coefficients from logistic regression model with greater speed
 
 
-pv.do.logreg <- function(df, x, y, by.var, w, ...){
+pv.do.logreg <- function(df, x, y, by.var, w){
   # Goal: Get coefficients from logistic regression
   # ------ INPUTS ------.
   # df : (dataframe) df to analyze previosly formated
@@ -55,7 +55,7 @@ pv.do.logreg <- function(df, x, y, by.var, w, ...){
   
   return(res.df)
 }
-pv.do.logreg.PAR <- function(df, x, y, by.var, w, ...){
+pv.do.logreg.PAR <- function(df, x, y, by.var, w, weighted.var){
   # Goal: Get coefficients from logistic regression
   # ------ INPUTS ------.
   # df : (dataframe) df to analyze previosly formated
@@ -67,7 +67,7 @@ pv.do.logreg.PAR <- function(df, x, y, by.var, w, ...){
   #(functions) weighted.var
   
   # get ... arguments
-  arg <- list(...)
+  # arg <- list(...)
   
   
   if (is.data.table(df)) {
@@ -143,15 +143,14 @@ pv.loop.logreg.on.weights <- function (data, x, y, by.var, over, test = F, flag 
     res.l <- foreach(w.i = rep_weights,
                      .packages = c("dplyr","tidyr","data.table","tibble"),
                      .export = c("pv.do.logreg.PAR","n.obs.x",
-                                 "weighted.var","...")) %dopar% {
+                                 "weighted.var")) %dopar% {
                                    
                                    res.df <- pv.do.logreg.PAR(data.par,
                                                           x,
                                                           y,
                                                           all_of(c(by.var,over)),
                                                           w.i,
-                                                          weighted.var = weighted.var,
-                                                          ...=...) %>% 
+                                                          weighted.var = weighted.var) %>% 
                                      unite("by.var", all_of(c(by.var,over)), sep = "|")
                                    return(res.df)
                                  }

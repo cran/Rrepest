@@ -90,17 +90,23 @@ grouped_sum_freqs <- function(data, small.level, big.level, w = NULL) {
   #Small group
   small.group <- data %>% 
     group_by(across(all_of(small.level))) %>% 
-    summarise(small.sum = sum(get(w), na.rm = T))
+    summarise(small.sum = sum(get(w), na.rm = T)) %>% 
+    ungroup() %>% # Complete missing combinations of data
+    complete(!!! rlang::syms(small.level), fill = list(small.sum = 0))
   
   #Bigger group with variable list fully contained in small group
   big.group <- data %>% 
     group_by(across(all_of(big.level))) %>% 
-    summarise(big.sum = sum(get(w), na.rm = T))
+    summarise(big.sum = sum(get(w), na.rm = T)) %>% 
+    ungroup() %>% # Complete missing combinations of data
+    complete(!!! rlang::syms(big.level), fill = list(small.sum = 0))
+  
   
   # Do frequencies in 100% format. Resulting variable is "freq"
   res <- full_join(small.group,big.group,by = big.level) %>%
     mutate(freq = small.sum / big.sum * 100) %>% 
-    select(-small.sum,-big.sum)
+    select(-small.sum,-big.sum) %>% 
+    
   
   return(res)
 }

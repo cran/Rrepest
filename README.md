@@ -28,9 +28,9 @@ install.packages("Rrepest")
 [Download Rrepest](https://gitlab.algobank.oecd.org/edu_data/rrepest/-/blob/main/Development/Rrepest.tar.gz),
 then run
 
-Run the following code replacing "You_R_Name" with your username:
+Run the following code replacing "Your_Path" with your path to the tar file:
 ``` r
-install.packages("C:/Users/You_R_Name/Downloads/Rrepest.tar.gz",
+install.packages("Your_Path/Rrepest.tar.gz",
 repos = NULL,
 type ="source")
 ```

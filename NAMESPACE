@@ -29,11 +29,12 @@ import(flextable)
 import(foreach)
 import(labelled)
 import(magrittr, except = c(set_names,extract))
-
-
 import(officer)
 import(parallel)
 import(purrr, except = c(when,compose,accumulate))
+import(rlang, except = c("flatten_lgl","splice","flatten_chr","flatten_raw","flatten","flatten_dbl","invoke","flatten_int",":=","%@%"))
+
+
 import(stringr)
 import(tibble)
 import(tidyr)
@@ -46,6 +47,7 @@ importFrom(stats,na.omit)
 importFrom(stats,qnorm)
 importFrom(stats,quasibinomial)
 importFrom(stats,resid)
+importFrom(stats,runif)
 importFrom(stats,setNames)
 importFrom(stats,weighted.mean)
 importFrom(utils,combn)

@@ -28,7 +28,7 @@ n_obs_x <- function(df, by, x, svy = NULL) {
   tot.n <- df %>%
     group_by(across(all_of(by))) %>%
     {if (svy == "TALISSCH") summarise(., n.obs = sum(!is.na(get(x)))) 
-      else if (svy == "TALISTCH") {mutate(.,school.n = ifelse(is.na(get(x)) == T, NA, .data$idschool)) %>% 
+      else if (svy %in% c("TALISTCH","TALISTKS")) {mutate(.,school.n = ifelse(is.na(get(x)) == T, NA, .data$idschool)) %>% 
           summarise(., n.obs = sum(!is.na(get(x))),
                     n.sch = n_distinct(school.n, na.rm = T))}
       else if (svy == "TALISEC_STAFF") {mutate(.,school.n = ifelse(is.na(get(x)) == T, NA, .data$idcentre)) %>% 
