@@ -123,7 +123,7 @@ Rrepest <- function(data, svy, est, by = NULL, over = NULL,
   }
   
   # Patch for TALISSCH: At least 50 that start with srwgt (2018 at. av)
-  if(sum(grepl("^crwgt",names(data))) > 50){
+  if(svy == "TALISSCH" & sum(grepl("^crwgt",names(data))) > 50){
     names(data)[names(data) == "schwgtc"] <- "schwgt"
     names(data)[names(data) %>% startsWith("crwgt")] <- paste0("s",substr(names(data)[names(data) %>% startsWith("crwgt")],2,10))
   }

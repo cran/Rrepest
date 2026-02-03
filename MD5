@@ -1,4 +1,4 @@
-e6d868e608ba690a7535b7d3e7c484b3 *DESCRIPTION
+98f158e93df5ab2bd66419674194a920 *DESCRIPTION
 8fd23aeadf39b2bf69dfca9aa3a70c06 *LICENSE
 2e6de78eaa91fde65e4fda1a33772e5c *NAMESPACE
 8a863873f57d628195cb46b0ab7c4359 *R/Mode.R
@@ -7,7 +7,7 @@ e6d868e608ba690a7535b7d3e7c484b3 *DESCRIPTION
 102fcc8863c3199f1c3d7f49184aa112 *R/coverage_daggers.R
 b3878f1c50acfc1c93cc715e32a19cb6 *R/coverage_pct.R
 38db934dcf91baddd7f019b5a3a5ac2c *R/data.R
-f9e0e897342533ebec71b5f9e105a41b *R/flags.R
+8100db9be9634d695e9d9a18f7fe521e *R/flags.R
 58239f2554a1e7891f38c01649bfc126 *R/format.data.categ.vars.R
 af7853691666400f93b3cac43be7cd14 *R/ft_significance.R
 2a0e87096bc441af65621567ab8e9f22 *R/globals.R
@@ -27,9 +27,9 @@ d02344a9c9225d0d489a31b546678224 *R/pv_rrepest_lin_reg.R
 0685cd57f3a7bad7f52f4ff6772d915c *R/pv_rrepest_logistic_reg.R
 b23a9bdee8cc8fd05c10fab00f26d8f0 *R/pv_rrepest_odds_ratio.R
 09d5db1940bf55047bc50841a2a3246d *R/pv_rrepest_quantiletable.R
-6b5c4995aa8579a1d6337aab53e08d0b *R/pv_rrepest_statistics.R
+72024a48d5254e4b1de419a1c11a62aa *R/pv_rrepest_statistics.R
 daf14e60e9a3aba34372c12ee466c671 *R/repest_auxiliaries.R
-f747835370f1daea1e7ffdc33a5d1027 *R/rrepest.R
+9e12902c9e06b1b809be85193861277e *R/rrepest.R
 3c2a7c1316f91f1ceac456f7b35c57ef *R/rrepest_base.R
 c72b74a1df1fb4d272df04f301cefa56 *R/test_for_over.R
 be48d8b1d274d7782e58e844fdb8404e *R/test_for_over_frequencies.R

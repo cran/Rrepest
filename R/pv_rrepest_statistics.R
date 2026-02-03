@@ -371,10 +371,15 @@ pv.rrepest.statistics <- function(data, svy, statistic = "mean", x, by.var = NUL
   if (length(over) > 0) {
     
     #reorder df with intercalating columns
-    n.betas <- (ncol(df.results) - 1)/2
-    betas.order <- lapply(1:n.betas,function(x) c(x,x+n.betas)) %>% 
-      reduce(function (x,y) c(x,y))
-    df.results <- df.results[,c(1,betas.order + 1)]
+    
+    # Get columns that start with "b."
+    b_only_cols <- names(df.results)[startsWith(names(df.results),"b.")]
+    # Start name from 3rd character and add b. & se. to each name to intercalate them
+    bse_col_order <- as.vector(sapply( substring(b_only_cols,3), function(name_i){
+      paste0(c("b.","se."),name_i)
+    }))
+    # Set in intercalated order
+    df.results <- df.results[,c("by.group",bse_col_order)]
   }
   
   

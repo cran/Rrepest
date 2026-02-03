@@ -1,5 +1,5 @@
 ################# Flags #################
-# 25 Feb 2023
+# 3 Feb 2026
 # Rodolfo Ilizaliturri
 #############################################################
 # Goal: Replace numeric variables with nans where there is not enough schools and or teachers
@@ -11,7 +11,7 @@ flags <- function(data, svy) {
   # data : (dataframe) must have last column have "n.sch" or two last columns "n.tch" and "n.sch"
   # svy : (str) survey to analyse
   
-  if (svy == "TALISSCH") {
+  if (svy %in% c("TALISSCH", "TALISEC_LEADER")) {
     #If principals questionnaire the just check for schools to add NaN
     res.df <- data %>% 
       mutate_if(is.numeric, list(~ifelse(
