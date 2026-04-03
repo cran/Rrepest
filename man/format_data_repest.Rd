@@ -28,6 +28,4 @@ Formatting target, by, and over variables for Rrepest.
 \examples{
 df1 <- format_data_repest(df_pisa18, "PISA", "pv1math", "cnt")
 df2 <- format_data_repest(df_pisa18, "PISA", "pv1math", c("cnt","st004d01t"))
-df3 <- format_data_repest(df_pisa18, "PISA", "pv1math", c("cnt","st004d01t","iscedl"))
-df4 <- format_data_repest(df_talis18, "TALISTCH", "tt3g02", "cntry", isced = 2)
 }

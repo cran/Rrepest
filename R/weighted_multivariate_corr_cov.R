@@ -13,7 +13,7 @@
 #' @examples
 #' data(df_talis18)
 #' 
-#' weighted.corr.cov.n(df_talis18,c("t3stake","t3team","t3stud"),"tchwgt")
+#' weighted.corr.cov.n(df_talis18,c("tt3g03","tt3g06a2","tt3g06b1"),"tchwgt")
 #' 
 weighted.corr.cov.n <- function(data, x, w =  rep(1, length(data[x[1]])), corr = TRUE, na.rm = TRUE) {
   # Goal: Get weighted correlation or covariance of n variables

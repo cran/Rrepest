@@ -17,26 +17,26 @@ average_groups(
 )
 }
 \arguments{
-\item{res}{(dataframe) df of results with b. and se. to average}
+\item{res}{(dataframe) Data frame of results, including estimates and standard errors to be averaged.}
 
-\item{data}{(dataframe) df from which to get replicated weights}
+\item{data}{(dataframe) Data frame containing replicated weights.}
 
-\item{group}{(grp function) that takes arguments group.name, column, cases to create averages at the end of dataframe}
+\item{group}{(grp function) Function used to compute grouped averages; takes arguments group.name, column, and cases, and appends results at the end of the data frame.}
 
-\item{by}{(string vector) column in which we'll break down results}
+\item{by}{(string vector) Variable(s) used to break down the results.}
 
-\item{over}{(vector string) columns over which to do analysis}
+\item{over}{(vector string) Variable(s) over which the analysis is performed.}
 
-\item{est}{(est function) that takes arguments what = estimate, tgt = target, rgr = regressor}
+\item{est}{(est function) Estimation function; takes arguments what = estimate, tgt = target, and rgr = regressor.}
 
-\item{svy}{(string) name of possible projects to analyse TALISSCH and TALISTCH}
+\item{svy}{(string) Name of the survey/project to analyse (e.g. TALISSCH, TALISTCH).}
 
-\item{user_na}{(bool) TRUE: show nature of user defined missing values for by.var}
+\item{user_na}{(bool) If TRUE, shows the nature of user-defined missing values for the grouping variable(s).}
 
-\item{...}{Additional arguments such as na_to_zero : (Bool) TRUE → will take NA as zero for the simple average calculation}
+\item{...}{Additional arguments such as na_to_zero: (Bool) TRUE → treats NA values as zero for simple average calculations.}
 }
 \value{
-Dataframe with avergas or weighted averages (totals) in last rows for the selected cases
+Dataframe with averages or weighted averages (totals) appended in the last rows for the selected cases.
 }
 \description{
 Group Averages

@@ -2,15 +2,13 @@
 #'
 #' @description Computes the number of valid (i.e. non-missing) observations for the column/variable of interest.
 #' @param df (data frame) Data to analyse with lowercase column names.
-#' @param by (string vector) Variable(s) used for tabulating the variable of interest
-#' @param x (string) Variable of interest for which to compute the number of valid (i.e. non-missing) observations
-#' @param svy (string) Survey settings that must be equal to one of the following: ALL, IALS, ICCS, ICILS, IELS,
-#' PBTS, PIAAC, PIRLS, PISA, PISAOOS, PISA2015, SSES, SSES2023, SVY, TALISSCH, TALISTCH, TALISEC_LEADER, TALISEC_STAFF, TIMSS
-#' @return Data frame containing the number of valid (i.e. non-missing) observations for the variable of interest
+#' @param by (string vector) Variable(s) used to tabulate the variable of interest.
+#' @param x (string) Variable of interest for which to compute the number of valid (i.e. non-missing) observations.
+#' @param svy (string) Survey setting, must be one of the following: ALL, IALS, ICCS, ICILS, IELS, PBTS, PIAAC, PIRLS, PISA, PISAOOS, PISA2015, SSES, SSES2023, SVY, TALISSCH, TALISTCH, TALISEC_LEADER, TALISEC_STAFF, TIMSS.
+#' @return Data frame containing the number of valid (i.e. non-missing) observations for the variable of interest.
 #' @export
 #'
 #' @examples
-#' n_obs_x(df = df_pisa18, by = "cnt",x = "wb173q03ha", svy = "PISA2015")
 #' n_obs_x(df = df_talis18, by = "cntry",x = "tt3g01", svy = "TALISTCH")
 n_obs_x <- function(df, by, x, svy = NULL) {
   # Goal: Number of schools and teachers calculation is performed on

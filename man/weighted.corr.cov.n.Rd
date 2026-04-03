@@ -32,6 +32,6 @@ Computes multivariate correlation and covariance for the variables of interest.
 \examples{
 data(df_talis18)
 
-weighted.corr.cov.n(df_talis18,c("t3stake","t3team","t3stud"),"tchwgt")
+weighted.corr.cov.n(df_talis18,c("tt3g03","tt3g06a2","tt3g06b1"),"tchwgt")
 
 }

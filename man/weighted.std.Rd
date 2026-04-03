@@ -22,5 +22,5 @@ Computes the weighted standard deviation of a numeric vector.
 \examples{
 data(df_talis18)
 
-weighted.std(df_talis18$TT3G02, df_talis18$TRWGT1)
+weighted.std(df_talis18$tt3g06d1, df_talis18$tt3g06e1)
 }

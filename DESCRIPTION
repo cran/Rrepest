@@ -1,7 +1,7 @@
 Package: Rrepest
 Title: An Analyzer of International Large Scale Assessments in
         Education
-Version: 1.6.11
+Version: 1.6.12
 Authors@R: 
     c(person("Rodolfo", "Ilizaliturri", , "rodolfo.ilizaliturri@oecd.org", role = c("aut", "cre")),
     person("Francesco", "Avvisati", , "francesco.avvisati@oecd.org", role = c("aut")),
@@ -18,10 +18,10 @@ Imports: data.table (>= 1.14.8), doParallel (>= 1.0.17), dplyr (>=
         tibble (>= 3.1.8), tidyr (>= 1.2.0)
 LazyData: true
 NeedsCompilation: no
-Packaged: 2026-02-03 10:02:06 UTC; Ilizaliturri_R
+Packaged: 2026-04-03 17:32:55 UTC; Ilizaliturri_R
 Author: Rodolfo Ilizaliturri [aut, cre],
   Francesco Avvisati [aut],
   Francois Keslair [aut]
 Maintainer: Rodolfo Ilizaliturri <rodolfo.ilizaliturri@oecd.org>
 Repository: CRAN
-Date/Publication: 2026-02-03 12:10:02 UTC
+Date/Publication: 2026-04-03 17:50:02 UTC

@@ -12,7 +12,7 @@
 #' @examples
 #' data(df_talis18) 
 #' 
-#' weighted.cov(x = df_talis18$t3stake, y = df_talis18$t3team, w = df_talis18$tchwgt)
+#' weighted.cov(x = df_talis18$tt3g06b2, y = df_talis18$tt3g06c2, w = df_talis18$tchwgt)
 weighted.cov <- function(x, y, w, na.rm = TRUE) {
   # Goal: Get weighted covariance
   # ------ INPUTS ------.

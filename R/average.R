@@ -1,17 +1,17 @@
 
 #' Group Averages
 #'
-#' @param data (dataframe) df from which to get replicated weights
-#' @param res (dataframe) df of results with b. and se. to average
-#' @param group (grp function) that takes arguments group.name, column, cases to create averages at the end of dataframe
-#' @param by (string vector) column in which we'll break down results
-#' @param over (vector string) columns over which to do analysis
-#' @param est (est function) that takes arguments what = estimate, tgt = target, rgr = regressor
-#' @param svy (string) name of possible projects to analyse TALISSCH and TALISTCH
-#' @param user_na (bool) TRUE: show nature of user defined missing values for by.var
-#' @param ... Additional arguments such as na_to_zero : (Bool) TRUE → will take NA as zero for the simple average calculation
+#' @param data (dataframe) Data frame containing replicated weights.
+#' @param res (dataframe) Data frame of results, including estimates and standard errors to be averaged.
+#' @param group (grp function) Function used to compute grouped averages; takes arguments group.name, column, and cases, and appends results at the end of the data frame.
+#' @param by (string vector) Variable(s) used to break down the results.
+#' @param over (vector string) Variable(s) over which the analysis is performed.
+#' @param est (est function) Estimation function; takes arguments what = estimate, tgt = target, and rgr = regressor.
+#' @param svy (string) Name of the survey/project to analyse (e.g. TALISSCH, TALISTCH).
+#' @param user_na (bool) If TRUE, shows the nature of user-defined missing values for the grouping variable(s).
+#' @param ... Additional arguments such as na_to_zero: (Bool) TRUE → treats NA values as zero for simple average calculations.
 #'
-#' @return Dataframe with avergas or weighted averages (totals) in last rows for the selected cases
+#' @return Dataframe with averages or weighted averages (totals) appended in the last rows for the selected cases.
 #'
 average_groups <- function(res, data = NULL, group, by = NULL, over = NULL, est = NULL, svy = NULL, user_na = FALSE, ...) {
   # Goal: Average across sub samples of results assuming same size

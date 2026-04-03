@@ -50,6 +50,7 @@ flags <- function(data, svy) {
     res.df <- res.df[-c(length(data)-1,length(data))]
     #res.df[ncol(res.df)] <- labelled_spss(res.df[[names(res.df)[ncol(res.df)]]], c(flagged = NaN))
   }else {
+    message("Survey not specified, using n < 30 for flag")
     #If all other surveys the just check for schools to add NaN
     res.df <- data %>% 
       mutate_if(is.numeric, list(~ifelse(

@@ -1,19 +1,19 @@
 #' Coverage percentage  (1 - mean(is.na)) * 100
 #'
-#' @description Cpmputes teh coverage percentage for the column/variable of interest.
-#' @param df (data frame) Data to analyse
-#' @param by (string vector) Variable(s) used for tabulating the variable of interest
-#' @param x (string) Variable of interest for which to compute the number of valid (i.e. non-missing) observations
-#' @param w (string) Vector of weights
-#' @param limit (numeric) Threshold at which, if lower, value will be TRUE
-#' @return Data frame containing the number of valid (i.e. non-missing) observations for the variable of interest
+#' @description Computes the coverage percentage for the column/variable of interest.
+#' @param df (data frame) Data to analyse.
+#' @param by (string vector) Variable(s) used to tabulate the variable of interest.
+#' @param x (string) Variable of interest for which to compute the number of valid (i.e. non-missing) observations.
+#' @param w (string) Vector of weights.
+#' @param limit (numeric) Threshold below which the value will be TRUE.
+#' @return Data frame containing the number of valid (i.e. non-missing) observations for the variable of interest.
 #' @export
 #'
 #' @examples
 #' data(df_pisa18)
 #' data(df_talis18) 
 #' 
-#' coverage_pct(df = df_pisa18, by = "cnt",x = "wb173q03ha")
+#' coverage_pct(df = df_pisa18, by = "cnt",x = "st003d03t")
 #' coverage_pct(df = df_talis18, by = "cntry",x = "tt3g01", w = "TCHWGT")
 coverage_pct <- function(df, by, x, w = NULL, limit = NULL) {
   # Goal: Number of schools and teachers calculation is performed on

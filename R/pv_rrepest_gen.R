@@ -22,12 +22,12 @@ pv.do.gen <- function(df, y, by.var, w, ...){
   # Only colnames of the same # of characters as my replicated weight name
   col_names <- subset(names(df), nchar(names(df)) == nchar(w))
   # Grab closest non case sensitive weight name
-  w <- col_names[grepl(w, col_names,ignore.case = T)]
-  
-  message(as.character(w)) #indicate wich w you are in
-  
+  w_sub <- col_names[grepl(w, col_names,ignore.case = T)]
+  # Add warning for missing weights
+  if(length(w_sub) == 0) message(w," does not exist in dataset")
+  message(as.character(w_sub)) #indicate wich w you are in
   # Replace what is w_gen with the replicated weight needed
-  y <- sub("w_gen",w,y)
+  y <- sub("w_gen",w_sub,y)
   #model only fitting values. Out: Coeff and R2 ONLY
   res.df <- df %>% 
     group_by(across(all_of(by.var))) %>% 
@@ -37,7 +37,6 @@ pv.do.gen <- function(df, y, by.var, w, ...){
     }
     ) %>%
     ungroup()
-  
   return(res.df)
 }
 pv.do.gen.PAR <- function(df, y, by.var, w, ...){
@@ -55,12 +54,14 @@ pv.do.gen.PAR <- function(df, y, by.var, w, ...){
   # Only colnames of the same # of characters as my replicated weight name
   col_names <- subset(names(df), nchar(names(df)) == nchar(w))
   # Grab closest non case sensitive weight name
-  w <- col_names[grepl(w, col_names,ignore.case = T)]
+  w_sub <- col_names[grepl(w, col_names,ignore.case = T)]
+  # Add warning for missing weights
+  if(length(w_sub) == 0) message(w," does not exist in dataset")
   
-  message(as.character(w)) #indicate which w you are in
+  message(as.character(w_sub)) #indicate which w you are in
   
   # Replace what is w_gen with the replicated weight needed
-  y <- sub("w_gen",w,y)
+  y <- sub("w_gen",w_sub,y)
   
   #model only fitting values. Out: Coeff and R2 ONLY
   res.df <- df %>% 

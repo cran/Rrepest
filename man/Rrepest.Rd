@@ -27,48 +27,45 @@ Rrepest(
 )
 }
 \arguments{
-\item{data}{(data frame) Data to analyse}
+\item{data}{(data frame) Data to analyse.}
 
-\item{svy}{(string) Declares the survey settings. It must be equal to one of the following: ALL, IALS, ICCS, ICILS, IELS,
-PBTS, PIAAC, PIRLS, PISA, PISAOOS, PISA2015, SSES, SSES2023, SVY, TALISSCH, TALISTCH, TALISEC_LEADER, TALISEC_STAFF, TIMSS.}
+\item{svy}{(string) Declares the survey settings. It must be equal to one of the following: ALL, IALS, ICCS, ICILS, IELS, PBTS, PIAAC, PIRLS, PISA, PISAOOS, PISA2015, SSES, SSES2023, SVY, TALISSCH, TALISTCH, TALISEC_LEADER, TALISEC_STAFF, TIMSS.}
 
-\item{est}{(est function) Specifies the estimates of interest. It has three arguments: statistics type, target variable and an (optional) regressor list in case of a linear regression.}
+\item{est}{(est function) Specifies the estimates of interest. It has three arguments: statistics type, target variable, and an (optional) regressor list in case of a linear regression.}
 
-\item{by}{(string vector) Produces separate estimates by levels of the variable(s) specified by the string vector.}
+\item{by}{(string vector) Produces separate estimates by levels of the variable(s) specified.}
 
-\item{over}{(string vector) Requests estimates to be obtained separately for each level of categorical variable(s) identified by the string vector.}
+\item{over}{(string vector) Requests estimates to be obtained separately for each level of the categorical variable(s) specified.}
 
-\item{test}{(bool) if TRUE: Computes the difference between estimates obtained for the lowest and highest values of the 'over' variable(s).
-(See 'over' option above.) It is useful to test for differences between dependent samples (e.g. female-male).}
+\item{test}{(bool) If TRUE: computes the difference between estimates obtained for the lowest and highest values of the 'over' variable(s) (see 'over' option above). Useful for testing differences between dependent samples (e.g. female-male).}
 
-\item{user_na}{(bool) if TRUE: Shows the nature of user defined missing values.}
+\item{user_na}{(bool) If TRUE: shows the nature of user-defined missing values.}
 
-\item{show_na}{(bool) if TRUE: Includes missing values (i.e. NAs) when estimating frequencies for the variable of interest.}
+\item{show_na}{(bool) If TRUE: includes missing values (i.e. NAs) when estimating frequencies for the variable of interest.}
 
-\item{flag}{(bool) if TRUE: Replaces estimation results that are based on fewer observations than required for reporting with NaN.
-When used with the PIAAC survey settings, it checks if each estimation result is based on at least 30 observations.
-When used with the PISA, PISAOOS, PISA2015 survey settings, it checks if each estimation result is based on at least 30 observations and 5 schools.
-When used with the TALISSCH survey settings, it checks if each estimation result is based on at least 10 schools.
-When used with the TALISTCH survey settings, it checks if each estimation result is based on at least 30 observations and 10 schools.}
+\item{flag}{(bool) If TRUE: replaces estimation results that are based on fewer observations than required for reporting with NaN.
+When used with the PIAAC survey settings, checks if each estimation result is based on at least 30 observations.
+When used with the PISA, PISAOOS, PISA2015 survey settings, checks if each estimation result is based on at least 30 observations and 5 schools.
+When used with the TALISSCH survey settings, checks if each estimation result is based on at least 10 schools.
+When used with the TALISTCH survey settings, checks if each estimation result is based on at least 30 observations and 10 schools.}
 
-\item{fast}{(bool) if TRUE: Computes estimates by using only 6 replicated weights.}
+\item{fast}{(bool) If TRUE: computes estimates using only 6 replicated weights.}
 
-\item{tabl}{(bool) if TRUE: Creates customisable and transferable tables using the flextable R package.}
+\item{tabl}{(bool) If TRUE: creates customisable and transferable tables using the flextable R package.}
 
-\item{average}{(grp function) Computes an arithmetic average (or weighted average). It has three arguments: name of the average, column/variable used for computing the average, rows/observations included in the average.
-It has three arguments: name of the group, column/variable used for computing the group, rows/observations included in the group.}
+\item{average}{(grp function) Computes an arithmetic (or weighted) average. It has three arguments: name of the average, column/variable used for computing the average, and rows/observations included in the average.}
 
 \item{total}{(grp function) Computes an average weighted by the estimated size of the target population covered.}
 
-\item{coverage}{(bool/numeric) TRUE: shows column next to se. Numeric: Shows NaN if bellow the set coverage.}
+\item{coverage}{(bool/numeric) TRUE: shows a column next to se. Numeric: shows NaN if below the specified coverage threshold.}
 
-\item{invert_tests}{(bool) Invert test columns from Rrepest test = TRUE by name on "b." and "se." in the column name and by sign (*-1) on "b."}
+\item{invert_tests}{(bool) Inverts test columns from Rrepest when test = TRUE, based on "b." and "se." in the column names, and by multiplying "b." by -1.}
 
 \item{save_arg}{(bool) TRUE: returns a named list with the estimation data frame and all arguments used in Rrepest.}
 
-\item{cores}{(numeric) NULL: Will recruit max-1 cores when doing PVs. Else, will recruit the specified number of cores for PVs}
+\item{cores}{(numeric) NULL: recruits max-1 cores when doing PVs; otherwise, uses the specified number of cores for PVs.}
 
-\item{se_zero2na}{(bool) TRUE: Masks SE of 0 as NA from a mean, meanpct, or freq with 1, 100, or 0}
+\item{se_zero2na}{(bool) TRUE: masks SE of 0 as NA for mean, meanpct, or freq equal to 1, 100, or 0.}
 
 \item{...}{Other optional parameters include:
 isced = Filters the data used for analysis by ISCED level (e.g. isced = 2),
